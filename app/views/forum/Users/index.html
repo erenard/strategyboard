@@ -1,0 +1,35 @@
+#{extends 'main.html' /}
+
+<h1 id="title">Users</h1>
+<p class="light">
+	#{pluralize size:nbUsers, word:'user' /}
+</p>
+
+#{pagination page:page ?: 1, size:nbUsers /}
+
+<table id="users-list">
+	<thead>
+		<tr>
+			<th class="main">User name</th>
+			<th class="infos">Topics</th>
+			<th class="infos">Posts</th>
+			<th class="infos">Games</th>
+		</tr>
+	</thead>
+	#{list items:users, as:'member'}
+		<tr>
+			<td class="main">
+				<a href="@{forum.Users.show(member.id)}">${member.name}</a>
+			</td>
+			<td class="main">
+				${member.topicsCount}
+			</td>
+			<td class="main">
+				${member.postsCount}
+			</td>
+			<td class="infos">
+				${member.gamesCount}
+			</td>
+		</tr>
+	#{/list}
+</table>

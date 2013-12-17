@@ -1,0 +1,52 @@
+#{extends 'main.html' /}
+<h1 id="title">Scores</h1>
+<p class="light">
+	#{pluralize size:nbScores, word:'score' /}
+</p>
+#{secure.check 'moderator'}
+<p><a href="@{openttd.Scores.exportAsCSV}">Export as CSV</a></p>
+#{/secure.check}
+<p>
+<b>Period :</b> 
+#{if period == 'last_month'}
+<strong>last month</strong>
+#{/if}
+#{else}
+<a href="@{openttd.Scores.show('last_month', 1)}">last month</a>
+#{/else}
+#{if period == 'forever'}
+<strong>forever</strong>
+#{/if}
+#{else}
+<a href="@{openttd.Scores.show('forever', 1)}">forever</a>
+#{/else}
+</p>
+#{pagination page:page ?: 1, size:nbScores /}
+<table id="users-list">
+	<thead>
+		<tr>
+			<th>#</th>
+			<th>Name</th>
+			<th>Points</th>
+			<th>Games</th>
+		</tr>
+	</thead>
+	<tbody>
+	#{list items:playerScores, as: 'score'}
+	#{if score.index % 3 == 0}
+		<tr style="background: #EEEEEE;">
+	#{/if}
+	#{else}
+		<tr>
+	#{/else}
+			<td>${score.index}
+			</td>
+			<td>
+				<a href="@{forum.Users.show(score.player.id)}">${score.player.name}</a>
+			</td>
+			<td>${score.points}</td>
+			<td>${score.gameCount}</td>
+		</tr>
+	#{/list}
+	</tbody>
+</table>

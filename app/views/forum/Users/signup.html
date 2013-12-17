@@ -1,0 +1,35 @@
+#{extends 'main.html' /}
+
+<h1 id="title">Signup</h1>
+<p class="light">
+	Please enter your user informations
+</p>
+
+<form id="userform" action="@{forum.Users.register}" method="POST" accept-charset="${_response_encoding}">
+	<p>
+		<label for="email">Email - <span class="light">We will send you an email for confirmation</span></label>
+		<input type="text" name="email" value="${flash.email}" id="email" />
+		<span class="error">#{error 'email' /}</span>
+	</p>
+	<p>
+		<label>Display name</label>
+		<input type="text" name="name" value="${flash.name}" id="name" />
+		<span class="error">#{error 'name' /}</span>
+	</p>
+	<p>
+		<label>Password - <span class="light">Enter the password twice. It must be at least 5 character long.</span></label>
+		<input type="password" name="password" value="${flash.password}" id="password" /><span class="error">#{error 'password' /}</span>
+		<label>Password confirmation</label>
+		<input type="password" name="password2" value="${flash.password2}" id="password2" /><span class="error">#{error 'password2' /}</span>
+	</p>
+	<p>
+		<label for="code">Please type the code below: </label>
+		<img src="@{Application.captcha(uuid)}" /> <br />
+		<input type="text" name="code" id="code" size="18" value="" />
+		<input type="hidden" name="uuid" value="${uuid}" />
+		<span class="error">#{error 'code' /}</span>
+	</p>
+	<p class="buttons">
+		<input type="submit" value="Signup" id="signupButton" />
+	</p>
+</form>

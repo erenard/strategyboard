@@ -1,0 +1,56 @@
+#{extends 'main.html' /}
+
+<h1 id="title">Categories</h1>
+<p class="light">
+	<strong>
+		#{pluralize size:forumsCount, word:'forum' /} in #{pluralize size:categoriesCount, word:'category' /}
+	</strong>
+</p>
+
+<table id="categories-list">
+	<thead>
+		<tr>
+			<th class="main">Category</th>
+			<th class="infos">Last post</th>
+		</tr>
+	</thead>
+	#{list items:categories, as:'category'}
+		<tr>
+			<td class="main">
+				<a href="@{Categories.show(category.id)}">${category.name}</a>
+				<p class="light">
+					 #{pluralize size:category.forumsCount, word:'forum' /}
+				</p>
+				${category.description}
+			</td>
+			<td class="infos">
+				#{if category.lastPost}
+					${category.lastPost.postedAt.since()} <br /> 
+					by <strong>${category.lastPost.postedBy.name}</strong> 
+					(<a href="@{forum.Topics.show(category.id, category.lastPost.topic.id, category.lastPost.topic.postsCount.page(pageSize))}">view</a>)
+				#{/if}
+				#{else}
+					No post
+				#{/else}
+			</td>
+		</tr>
+	#{/list}
+</table>
+
+#{if connected?.admin}
+	<div id="youreadmin">
+		Administrator options
+	</div>
+
+	<div class="box">
+		<h2>Create a new category</h2>
+		<form action="@{Categories.create}" method="POST">
+			<input type="text" name="name" size="30" id="name" /> <span class="error">#{error 'name' /}</span>
+			
+			<label for="description">Set a description</label>
+			<textarea name="description" rows="6" id="description">${flash.description}</textarea>
+			<hr />
+			<input type="submit" value="Add this category" id="addCategory" />
+		</form>
+	</div>
+#{/if}

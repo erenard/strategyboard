@@ -1,0 +1,164 @@
+*{ You can use plain selenium command using the selenium tag }*
+
+#{fixture delete: models.forum.Category.class /}
+#{fixture delete: models.forum.Forum.class /}
+#{fixture delete: models.forum.Topic.class /}
+#{fixture delete: models.forum.Post.class /}
+#{fixture delete: models.forum.UserGroup.class /}
+#{fixture delete: models.forum.User.class /}
+#{fixture load: 'data.yml' /}
+
+#{selenium 'Anonymous tests'}
+	open('/logout')
+	clearSession();
+
+    // Open the home page, and check that no error occured
+    open('/')
+    assertNotTitle('Application error')
+    assertTextNotPresent('Administration')
+    assertTextPresent('Forums')
+    
+	// Forum access
+    clickAndWait('link=Forums')
+    assertTextPresent('Main Category')
+    assertTextNotPresent('Moderators Category')
+
+	// Main forum access
+	clickAndWait('link=mainForum1')
+    assertTextPresent('Topic Normal')
+    assertTextPresent('Topic Locked')
+    assertTextNotPresent('Topic Hidden')
+    assertTextNotPresent('Post a new topic')
+    assertElementNotPresent('lockIt')
+
+	// Topic access
+	clickAndWait('link=Topic Normal')
+    assertTextPresent('Topic Normal')
+    assertTextNotPresent('Reply')
+    assertElementNotPresent('lockIt')
+    assertElementNotPresent('hideIt')
+    
+#{/selenium}
+
+#{selenium 'User tests'}
+	clearSession();
+
+    // Open the home page, and check that no error occured
+    open('/login')
+    type('username', 'bob@domain.com')
+    type('password', 'secret')
+    clickAndWait('signin')
+    assertTextPresent('Welcome Bob')
+    assertTextPresent('Logout')
+    
+    // Open the home page, and check that no error occured
+    open('/')
+    assertNotTitle('Application error')
+    assertTextNotPresent('Administration')
+    assertTextPresent('Forums')
+    
+	// Forum access
+    clickAndWait('link=Forums')
+    assertTextPresent('Main Category')
+    assertTextNotPresent('Moderators Category')
+
+	// Main forum access
+	clickAndWait('link=mainForum1')
+    assertTextPresent('Topic Normal')
+    assertTextPresent('Topic Locked')
+    assertTextNotPresent('Topic Hidden')
+    assertTextPresent('Post a new topic')
+    assertElementNotPresent('lockIt')
+
+	// Topic access
+	clickAndWait('link=Topic Normal')
+    assertTextPresent('Topic Normal')
+    assertTextPresent('Reply')
+    assertElementNotPresent('lockIt')
+    assertElementNotPresent('hideIt')
+    
+    clickAndWait('link=Logout')
+
+#{/selenium}
+
+#{selenium 'Moderation tests'}
+	clearSession();
+
+    // Open the home page, and check that no error occured
+    open('/login')
+    type('username', 'modo@domain.com')
+    type('password', 'secret')
+    clickAndWait('signin')
+    assertTextPresent('Welcome Moderator')
+    assertTextPresent('Logout')
+    
+    // Open the home page, and check that no error occured
+    open('/')
+    assertNotTitle('Application error')
+    assertTextNotPresent('Administration')
+    assertTextPresent('Forums')
+    
+	// Forum access
+    clickAndWait('link=Forums')
+    assertTextPresent('Main Category')
+    assertTextPresent('Moderators Category')
+
+	// Main forum access
+	clickAndWait('link=mainForum1')
+    assertTextPresent('Topic Normal')
+    assertTextPresent('Topic Locked')
+    assertTextPresent('Topic Hidden')
+    assertTextPresent('Post a new topic')
+    assertElementPresent('lockIt')
+
+	// Topic access
+	clickAndWait('link=Topic Normal')
+    assertTextPresent('Topic Normal')
+    assertTextPresent('Reply')
+    assertElementPresent('lockIt')
+    assertElementPresent('hideIt')
+    
+    clickAndWait('link=Logout')
+    
+#{/selenium}
+
+#{selenium 'Admin tests'}
+	clearSession();
+
+    // Open the home page, and check that no error occured
+    open('/login')
+    type('username', 'admin@domain.com')
+    type('password', 'secret')
+    clickAndWait('signin')
+    assertTextPresent('Welcome Admin')
+    assertTextPresent('Logout')
+    
+    // Open the home page, and check that no error occured
+    open('/')
+    assertNotTitle('Application error')
+    assertTextPresent('Administration')
+    assertTextPresent('Forums')
+    
+	// Forum access
+    clickAndWait('link=Forums')
+    assertTextPresent('Main Category')
+    assertTextPresent('Moderators Category')
+
+	// Main forum access
+	clickAndWait('link=mainForum1')
+    assertTextPresent('Topic Normal')
+    assertTextPresent('Topic Locked')
+    assertTextPresent('Topic Hidden')
+    assertTextPresent('Post a new topic')
+    assertElementPresent('lockIt')
+
+	// Topic access
+	clickAndWait('link=Topic Normal')
+    assertTextPresent('Topic Normal')
+    assertTextPresent('Reply')
+    assertElementPresent('lockIt')
+    assertElementPresent('hideIt')
+    
+    clickAndWait('link=Logout')
+    
+#{/selenium}

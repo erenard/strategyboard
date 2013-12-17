@@ -1,0 +1,32 @@
+*{ You can use plain selenium command using the selenium tag }*
+
+#{fixture delete: models.forum.Category.class /}
+#{fixture delete: models.forum.Forum.class /}
+#{fixture delete: models.forum.Topic.class /}
+#{fixture delete: models.forum.Post.class /}
+#{fixture delete: models.forum.UserGroup.class /}
+#{fixture delete: models.forum.User.class /}
+#{fixture load: 'data.yml' /}
+
+#{selenium 'Security check'}
+	// Unlogged Admin access    
+	clearSession();
+    open('/admin')
+    assertNotTitle('Application error')
+    assertTextNotPresent('Not Found')
+    assertTextNotPresent('Administration')
+    
+    // Home page
+	clearSession();
+    open('/')
+    assertNotTitle('Application error')
+    assertTextNotPresent('Not Found')
+    assertTextNotPresent('Administration')
+    
+    // Anonymous Admin access
+    open('/admin')
+    assertNotTitle('Application error')
+    assertTextNotPresent('Not Found')
+    assertTextPresent('Forbidden')
+    
+#{/selenium}

@@ -1,0 +1,65 @@
+#{extends 'main.html' /}
+#{set title: forum.name /}
+<div id="breadcrumb">
+	<a href="@{forum.Forums.index}">Forums</a> →
+</div>
+
+<h1 id="title">${forum.name}</h1>
+<p class="light">
+	<strong>
+		#{pluralize size:postsCount, word:'post' /} in #{pluralize size:topicsCount, word:'topic' /}
+	</strong>
+</p>
+
+#{secure.check 'poster'}
+#{ifnot forum.locked}
+	<div id="newTopic">
+		<a class="action" href="@{forum.Topics.post(forum.id)}">Post a new topic</a>
+	</div>
+#{/ifnot}
+#{/secure.check}
+
+#{pagination page:page ?: 1, size:topicsCount /}
+
+<table id="topics-list">
+	<thead>
+		<tr>
+			<th>Topics</th>
+			<th>Posts</th>
+			<th>Views</th>
+			<th>Last Post</th>
+		</tr>
+	</thead>
+	#{list items:topics, as:'topic'}
+		<tr>
+			<td class="main">
+				<a href="@{forum.Topics.show(topic.forum.id, topic.id)}">${topic.firstPost.subject}</a>
+				#{if topic.postsCount > pageSize}
+					&nbsp;<a class="last" href="@{forum.Topics.show(topic.forum.id, topic.id, topic.postsCount.page(pageSize))}">last page</a>
+				#{/if}
+			</td>
+			<td class="infos count">
+				${topic.postsCount}
+			</td>
+			<td class="infos count">
+				${topic.views}
+			</td>
+			<td class="infos">
+				#{if topic.lastPost}
+					${topic.lastPost.postedAt.since()} <br /> 
+					by <strong>${topic.lastPost.postedBy.name}</strong> (<a href="@{forum.Topics.show(topic.forum.id, topic.id, topic.postsCount.page(pageSize))}">view</a>)
+				#{/if}
+			</td>
+		</tr>
+	#{/list}
+</table>
+
+#{secure.check 'moderator'}
+	<div id="youreadmin">Moderation options</div>
+	<div class="box">
+		<h2>Lock this forum</h2>
+		<form action="@{forum.Forums.lock(forum.id)}" method="POST">
+			<input type="submit" value="(Un)lock" id="lockIt" />
+		</form>
+	</div>
+#{/secure.check}

@@ -1,0 +1,122 @@
+# Test data
+
+Category(mainCategory):
+  name: Main Category
+  description: Main Category
+
+Category(moderatorsCategory):
+  name: Moderators Category
+  description: Moderators Category
+
+UserGroup(admin):
+  name:        Admin
+  description: Admin
+  admin:       true
+
+UserGroup(moderators):
+  name:        Moderators
+  description: Moderators
+  admin:       false
+
+UserGroup(users):
+  name:        General
+  description: General
+  admin:       false
+
+UserGroup(anonymous):
+  name:        Anonymous
+  description: Anonymous
+  admin:       false
+
+Permission(postMain):
+  category:    "mainCategory"
+  group:       "users"
+  accessLevel: 3
+
+Permission(moderateMain):
+  category:    "mainCategory"
+  group:       "moderators"
+  accessLevel: 4
+
+Permission(postModerators):
+  category:   "moderatorsCategory"
+  group:      "moderators"
+  accessLevel: 3
+
+Permission(viewAnonymous):
+  category:    "mainCategory"
+  group:       "anonymous"
+  accessLevel: 1
+
+# passwords : secret
+
+User(admin):
+    email:        admin@domain.com
+    passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+    name:         Admin
+    group:        "admin"
+
+User(modo):
+    email:        modo@domain.com
+    passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+    name:         Moderator
+    group:        "moderators"
+
+User(bob):
+    email:        bob@domain.com
+    passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+    name:         Bob
+    group:        "users"
+
+User(anonymous):
+    email:        anonymous@domain.com
+    passwordHash: 
+    name:         Anonymous
+    group:        "anonymous"
+
+Forum(mainForum1):
+  name:        mainForum1
+  description: Main forum 1 description
+  category:    "mainCategory"
+  locked:      false
+  topics:      [t1, t2, t3]
+
+Topic(t1):
+  subject: Topic Normal
+  views:   0
+  forum:   "mainForum1"
+  locked:  false
+  hidden:  false
+
+Topic(t2):
+  subject: Topic Locked
+  views:   0
+  forum:   "mainForum1"
+  locked:  true
+  hidden:  false
+
+Topic(t3):
+  subject: Topic Hidden
+  views:   0
+  forum:   "mainForum1"
+  locked:  false
+  hidden:  true
+
+Forum(mainForum2):
+  name:        mainForum2
+  description: Main forum 2 description
+  category:    "mainCategory"
+  locked:      false
+
+Forum(modoForum1):
+  name:        modoForum1
+  description: Moderators forum 1 description
+  category:    "moderatorsCategory"
+  locked:      false
+
+Forum(modoForum2):
+  name:        modoForum2
+  description: Moderators forum 2 description
+  category:    "moderatorsCategory"
+  locked:      false
+

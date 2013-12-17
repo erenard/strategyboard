@@ -1,0 +1,32 @@
+# Init data
+forum.UserGroup(admins):
+  name:        Admin
+  description: Admin
+  admin:       true
+
+forum.UserGroup(moderators):
+  name:        Moderators
+  description: Moderators
+  admin:       false
+
+forum.UserGroup(users):
+  name:        General
+  description: General
+  admin:       false
+
+forum.UserGroup(anonymous):
+  name:        Anonymous
+  description: Anonymous
+  admin:       false
+
+#forum.User(anonymous):
+#    email:        anonymous@domain.com
+#    passwordHash: 
+#    name:         Anonymous
+#    group:        "anonymous"
+
+#forum.User(admin):
+#    email:        admin@domain.com
+#    passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+#    name:         Admin
+#    group:        "admins"

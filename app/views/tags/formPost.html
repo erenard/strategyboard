@@ -1,0 +1,13 @@
+<form id="post" action="@{forum.Topics.create(forum.id)}" method="POST" accept-charset="${_response_encoding}">
+	<p>
+		<label>Subject</label>
+		<input type="text" name="subject" value="" id="subject" /> <span class="error">#{error 'subject' /}</span>
+	</p>
+	<p>
+		<label>Content</label>
+		<textarea name="content" rows="8" cols="40" id="contentText">${flash.content}</textarea>
+	</p>
+	<p>
+		<input type="submit" value="Create this topic" id="postTopic" /> or <a class="action" href="@{forum.Forums.show(forum.id)}">cancel</a>
+	</p>
+</form>

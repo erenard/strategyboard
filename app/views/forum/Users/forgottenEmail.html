@@ -1,0 +1,22 @@
+#{extends 'main.html' /}
+
+<h1 id="title">Email retrieval</h1>
+<p class="light">
+	Please enter your pseudo and password.
+</p>
+
+<form id="userform" action="@{forum.Users.showEmail}" method="POST" accept-charset="${_response_encoding}">
+	<p>
+		<label>Pseudo</label>
+		<input type="text" name="pseudo"/>
+		<span class="error">#{error 'pseudo' /}</span>
+	</p>
+	<p>
+		<label>Password</label>
+		<input type="password" name="password"/>
+		<span class="error">#{error 'password' /}</span>
+	</p>
+	<p class="buttons">
+		<input type="submit" value="Show my email" />
+	</p>	
+</form>

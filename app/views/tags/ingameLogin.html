@@ -1,0 +1,13 @@
+<table>
+	<thead>
+		<tr><th>In game login</th></tr>
+	</thead>
+	<tbody>
+		#{if _arg}
+		<tr><td align="center">!login ${_arg.uuid}</td></tr>
+		#{/if}
+		#{else}
+		<tr><td><a href="@{Secure.login}">Login</a></td></tr>
+		#{/else}
+	</tbody>
+</table>

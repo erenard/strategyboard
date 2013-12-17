@@ -1,0 +1,14 @@
+# You can specialize this file for each language.
+# For example, for French create a messages.fr file
+#
+success.forum.locked=The forum has been locked.
+success.forum.unlocked=The forum has been unlocked.
+error.forum.locked=This forum is not open for posting.
+success.topic.hidden=The topic has been hidden.
+success.topic.restored=The topic has been restored.
+success.topic.locked=The topic has been locked.
+success.topic.unlocked=The topic has been unlocked.
+success.topic.moved=The topic has been moved.
+success.topic.deleted=The topic has been deleted.
+error.topic.locked=This topic is not open for replying.
+secure.error=Oops, unknown email or password.

@@ -1,0 +1,28 @@
+#{extends 'main.html' /} #{set title: 'Mandelbrot WebGL rendering' /}
+<script type="text/javascript" src="/public/html5/mandelbrot/resources.js"></script>
+<script type="text/javascript" src="/public/html5/mandelbrot/mandelbrot.js"></script>
+<h1 id="title">Mandelbrot fractal</h1>
+<p class="light">
+	<strong> Rendered with WebGL shaders</strong>
+</p>
+<div>
+	<canvas id="mycanvas" width="640" height="480" style="display: inline-block; cursor: move;"></canvas>
+	<div style="display: inline-block; vertical-align: top;">
+		<div style="vertical-align: baseline;">
+			<h1>Controls</h1>
+			<p><input type="button" value="Increase" id="increaseIteration"> or <button id="decreaseIteration">decrease</button> the maximum number of iteration: <span id="maxIteration" style="font-weight: bold">64</span></p>
+			<p>Actual zoom: x<span id="scale" style="font-weight: bold">1</span></p>
+			Click to change the color palette: 
+			<div id="selectionPalette" style="position: absolute;">
+				<div class="colorPalette" id="paletteBlueYellow" style="background-image: url('/public/html5/mandelbrot/paletteBlueYellow.png'); width: 256px; height: 16px;"></div>
+				<div class="colorPalette" id="paletteFrequency"  style="background-image: url('/public/html5/mandelbrot/paletteFrequency.png'); width: 256px; height: 16px;"></div>
+				<div class="colorPalette" id="paletteHue"        style="background-image: url('/public/html5/mandelbrot/paletteHue.png'); width: 256px; height: 16px;"></div>
+				<div class="colorPalette" id="paletteRedGreen"   style="background-image: url('/public/html5/mandelbrot/paletteRedGreen.png'); width: 256px; height: 16px;"></div>
+				<div class="colorPalette" id="paletteRedYellow"  style="background-image: url('/public/html5/mandelbrot/paletteRedYellow.png'); width: 256px; height: 16px;"></div>
+				<div class="colorPalette" id="paletteWavelength" style="background-image: url('/public/html5/mandelbrot/paletteWavelength.png'); width: 256px; height: 16px;"></div>
+			</div>
+			<div id="selectedPalette" style="background-image: url('/public/html5/mandelbrot/paletteRedYellow.png'); width: 256px; height: 16px; cursor: pointer;"></div>
+			<p>Drag and drop to navigate, use the mouse wheel to zoom in and out !</p>
+		</div>
+	</div>
+</div>

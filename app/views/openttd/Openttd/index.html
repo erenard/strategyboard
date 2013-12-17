@@ -1,0 +1,28 @@
+#{extends 'main.html' /}
+#{set title: 'OpenTTD' /}
+<h1 id="title">OpenTTD server</h1>
+<div class="rightPageContainer">
+#{ingameLogin connectedUser /}
+#{miniLeaderBoard playerScores /}
+#{secure.check 'moderator'}
+<div>
+	<div id="youreadmin">Moderation options</div>
+	<div class="box">
+		<h2>OpenTTD Server</h2>
+		<form action="@{openttd.Openttd.start()}" method="POST" style="display: inline;">
+			<input type="submit" value="Start" />
+		</form>
+		<form action="@{openttd.Openttd.stop()}" method="POST" style="display: inline;">
+			<input type="submit" value="Stop" />
+		</form>
+	</div>
+</div>
+#{/secure.check}
+</div>
+<div class="news">
+#{showOpenTTDStatus openTTDStatus /}
+<h2>Recent games ...</h2>
+#{showRecentGames lastPlayedGames /}
+<h2>Best games ...</h2>
+#{showRecentGames bestPlayedGames /}
+</div>

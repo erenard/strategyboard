@@ -1,0 +1,26 @@
+#users-list .infos {
+	width: 5%;
+	text-align: center;
+}
+
+#userform label {
+	display: block;
+	color: #333;
+}
+
+#userform a {
+	display: block;
+	color: #333;
+}
+
+#userform input[type=text] {
+	width: 250px;
+}
+
+#userform input[type=password] {
+	width: 250px;
+}
+
+#userform .buttons {
+	margin-top: 20px;
+}

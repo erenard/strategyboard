@@ -1,0 +1,408 @@
+[robot]
+goal_performance = 400
+game_league = 5
+timer_duration = 10
+
+[misc]
+display_opt = SHOW_TOWN_NAMES|SHOW_STATION_NAMES|SHOW_SIGNS|FULL_ANIMATION|FULL_DETAIL|WAYPOINTS
+news_ticker_sound = true
+fullscreen = false
+graphicsset = 
+soundsset = 
+musicset = 
+videodriver = 
+musicdriver = 
+sounddriver = 
+blitter = 
+language = english.lng
+resolution = 1280,813
+screenshot_format = 
+savegame_format = 
+rightclick_emulate = false
+small_font = 
+medium_font = 
+large_font = 
+small_size = 6
+medium_size = 10
+large_size = 16
+small_aa = false
+medium_aa = false
+large_aa = false
+sprite_cache_size = 4
+player_face = 0
+transparency_options = 0
+transparency_locks = 0
+invisibility_options = 0
+keyboard = 
+keyboard_caps = 
+
+[music]
+playlist = 0
+music_vol = 127
+effect_vol = 127
+custom_1 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+custom_2 = 0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0
+playing = false
+shuffle = false
+
+[win32]
+display_hz = 0
+force_full_redraw = false
+fullscreen_bpp = 8
+window_maximize = true
+
+[difficulty]
+max_no_competitors = 0
+number_towns = 0
+number_industries = 2
+max_loan = 100000
+initial_interest = 4
+vehicle_costs = 2
+competitor_speed = 3
+vehicle_breakdowns = 2
+subsidy_multiplier = 1
+construction_cost = 2
+terrain_type = 2
+quantity_sea_lakes = 2
+economy = 0
+line_reverse_mode = 1
+disasters = 0
+town_council_tolerance = 2
+diff_level = 3
+
+[game_creation]
+town_name = english
+landscape = temperate
+snow_line = 56
+snow_line_height = 7
+starting_year = 1950
+land_generator = 1
+oil_refinery_limit = 32
+tgen_smoothness = 2
+generation_seed = 791037303
+tree_placer = 2
+heightmap_rotation = 0
+se_flat_world_height = 1
+map_x = 9
+map_y = 10
+water_borders = 15
+custom_town_number = 1
+variety = 0
+
+[vehicle]
+road_side = right
+train_acceleration_model = 1
+mammoth_trains = true
+never_expire_vehicles = false
+max_trains = 400
+max_roadveh = 500
+max_aircraft = 100
+max_ships = 300
+wagon_speed_limits = true
+disable_elrails = false
+freight_trains = 10
+plane_speed = 4
+dynamic_engines = false
+extend_vehicle_life = 0
+train_slope_steepness = 3
+plane_crashes = 2
+servint_ispercent = false
+servint_trains = 150
+servint_roadveh = 150
+servint_ships = 360
+servint_aircraft = 210
+
+[construction]
+build_on_slopes = true
+autoslope = true
+extra_dynamite = false
+longbridges = true
+signal_side = true
+road_stop_on_town_road = false
+road_stop_on_competitor_road = false
+raw_industry_construction = 0
+freeform_edges = false
+extra_tree_placement = 2
+
+[station]
+never_expire_airports = false
+join_stations = true
+nonuniform_stations = false
+station_spread = 8
+modified_catchment = true
+adjacent_stations = true
+distant_join_stations = false
+
+[economy]
+town_layout = 1
+allow_town_roads = true
+found_town = 0
+station_noise_level = true
+inflation = true
+multiple_industry_per_town = false
+bribe = true
+exclusive_rights = false
+give_money = false
+smooth_economy = true
+allow_shares = false
+feeder_payment_share = 75
+town_growth_rate = 1
+larger_towns = 5
+initial_city_size = 2
+mod_road_rebuild = true
+dist_local_authority = 20
+town_noise_population[0] = 800
+town_noise_population[1] = 2000
+town_noise_population[2] = 4000
+
+[pf]
+forbid_90_deg = true
+roadveh_queue = true
+pathfinder_for_trains = 2
+pathfinder_for_roadvehs = 2
+pathfinder_for_ships = 0
+wait_oneway_signal = 15
+wait_twoway_signal = 41
+wait_for_pbs_path = 30
+reserve_paths = false
+path_backoff_interval = 20
+opf.pf_maxlength = 4096
+opf.pf_maxdepth = 48
+npf.npf_max_search_nodes = 10000
+npf.npf_rail_firstred_penalty = 1000
+npf.npf_rail_firstred_exit_penalty = 10000
+npf.npf_rail_lastred_penalty = 1000
+npf.npf_rail_station_penalty = 100
+npf.npf_rail_slope_penalty = 100
+npf.npf_rail_curve_penalty = 100
+npf.npf_rail_depot_reverse_penalty = 5000
+npf.npf_rail_pbs_cross_penalty = 300
+npf.npf_rail_pbs_signal_back_penalty = 1500
+npf.npf_buoy_penalty = 200
+npf.npf_water_curve_penalty = 100
+npf.npf_road_curve_penalty = 100
+npf.npf_crossing_penalty = 300
+npf.npf_road_drive_through_penalty = 800
+npf.npf_road_dt_occupied_penalty = 800
+npf.npf_road_bay_occupied_penalty = 1500
+npf.maximum_go_to_depot_penalty = 2000
+yapf.disable_node_optimization = false
+yapf.max_search_nodes = 10000
+yapf.rail_firstred_twoway_eol = false
+yapf.rail_firstred_penalty = 1000
+yapf.rail_firstred_exit_penalty = 10000
+yapf.rail_lastred_penalty = 1000
+yapf.rail_lastred_exit_penalty = 10000
+yapf.rail_station_penalty = 1000
+yapf.rail_slope_penalty = 200
+yapf.rail_curve45_penalty = 100
+yapf.rail_curve90_penalty = 600
+yapf.rail_depot_reverse_penalty = 5000
+yapf.rail_crossing_penalty = 300
+yapf.rail_look_ahead_max_signals = 10
+yapf.rail_look_ahead_signal_p0 = 500
+yapf.rail_look_ahead_signal_p1 = -100
+yapf.rail_look_ahead_signal_p2 = 5
+yapf.rail_pbs_cross_penalty = 300
+yapf.rail_pbs_station_penalty = 800
+yapf.rail_pbs_signal_back_penalty = 1500
+yapf.rail_doubleslip_penalty = 100
+yapf.rail_longer_platform_penalty = 800
+yapf.rail_longer_platform_per_tile_penalty = 0
+yapf.rail_shorter_platform_penalty = 4000
+yapf.rail_shorter_platform_per_tile_penalty = 0
+yapf.road_slope_penalty = 200
+yapf.road_curve_penalty = 100
+yapf.road_crossing_penalty = 300
+yapf.road_stop_penalty = 800
+yapf.road_stop_occupied_penalty = 800
+yapf.road_stop_bay_occupied_penalty = 1500
+yapf.maximum_go_to_depot_penalty = 2000
+
+[order]
+gotodepot = true
+no_servicing_if_no_breakdowns = true
+timetabling = true
+improved_load = true
+selectgoods = true
+serviceathelipad = true
+gradual_loading = true
+
+[ai]
+ai_in_multiplayer = true
+ai_disable_veh_train = false
+ai_disable_veh_roadveh = false
+ai_disable_veh_aircraft = true
+ai_disable_veh_ship = false
+ai_max_opcode_till_suspend = 10000
+
+[locale]
+currency = EUR
+units = metric
+digit_group_separator = 
+digit_group_separator_currency = 
+digit_decimal_separator = 
+
+[gui]
+autosave = off
+date_format_in_default_names = long
+vehicle_speed = true
+status_long_date = true
+show_finances = true
+autoscroll = false
+reverse_scroll = false
+smooth_scroll = false
+left_mouse_btn_scrolling = false
+measure_tooltip = true
+errmsg_duration = 5
+toolbar_pos = 0
+window_snap_radius = 10
+window_soft_limit = 20
+population_in_label = true
+link_terraform_toolbar = false
+liveries = 2
+prefer_teamchat = false
+scrollwheel_scrolling = 0
+scrollwheel_multiplier = 5
+pause_on_newgame = false
+advanced_vehicle_list = 1
+timetable_in_ticks = false
+quick_goto = false
+loading_indicators = 1
+default_rail_type = 2
+enable_signal_gui = true
+coloured_news_year = 2000
+drag_signals_density = 4
+semaphore_build_before = 1975
+vehicle_income_warn = true
+order_review_system = 1
+lost_train_warn = true
+autorenew = false
+autorenew_months = 6
+autorenew_money = 100000
+always_build_infrastructure = false
+new_nonstop = false
+keep_all_autosave = false
+autosave_on_exit = false
+max_num_autosaves = 16
+bridge_pillars = true
+auto_euro = true
+news_message_timeout = 2
+show_track_reservation = false
+default_signal_type = 0
+cycle_signal_types = 2
+station_numtracks = 1
+station_platlength = 5
+station_dragdrop = true
+station_show_coverage = false
+persistent_buildingtools = false
+expenses_layout = false
+console_backlog_timeout = 100
+console_backlog_length = 100
+network_chat_box_width = 700
+network_chat_box_height = 25
+threaded_saves = true
+smallmap_land_colour = 0
+timetable_arrival_departure = true
+stop_location = 2
+show_date_in_logs = false
+developer = 1
+
+[network]
+max_join_time = 500
+pause_on_join = false
+server_port = 3979
+server_advertise = true
+lan_internet = 0
+client_name = Server
+server_password = 
+rcon_password = plop
+default_company_pass = 
+server_name = ! Goal Server ! Hard - Steam Environment
+connect_to_ip = 
+network_id = 6cb30958ab0fda67d2765452f8c002f7
+autoclean_companies = true
+autoclean_unprotected = 12
+autoclean_protected = 36
+autoclean_novehicles = 1
+max_companies = 15
+max_clients = 30
+max_spectators = 8
+restart_game_year = 0
+min_active_clients = 1
+server_lang = ANY
+reload_cfg = true
+last_host = 192.168.0.1
+last_port = 3979
+no_http_content_downloads = false
+commands_per_frame = 2
+max_commands_in_queue = 16
+bytes_per_frame = 8
+bytes_per_frame_burst = 256
+server_admin_port = 3977
+server_admin_chat = true
+admin_password = plop
+
+[currency]
+rate = 1
+separator = .
+to_euro = 1
+prefix = ""
+suffix = " credits"
+
+[company]
+engine_renew = false
+engine_renew_months = 6
+engine_renew_money = 100000
+renew_keep_length = false
+
+[server_bind_addresses]
+
+[servers]
+
+[bans]
+
+[news_display]
+arrival_player = full
+arrival_other = full
+accident = full
+company_info = full
+open = full
+close = full
+economy = full
+production_player = full
+production_other = full
+production_nobody = full
+advice = full
+new_vehicles = full
+acceptance = full
+subsidies = full
+general = full
+
+[ai_players]
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+none = start_date=365
+
+[version]
+version_string = 1.0.5
+version_number = 1058531E
+
+[newgrf]
+generic_tram_set.0.4/generictrams.grf =
+experts_hard___industries.0.4/eh_industries.grf =
+basemod-3.2/basecosts.grf = 21 11 57 10 18 7 34 6 40 10 41 10 45 10
+
+[newgrf-static]

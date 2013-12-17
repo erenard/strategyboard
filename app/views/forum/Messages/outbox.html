@@ -1,0 +1,25 @@
+#{extends 'main.html' /}
+
+<h1 id="title">${user.name}</h1>
+<p class="light">
+	<strong>Outbox</strong>
+</p>
+
+<table>
+	<thead>
+		<tr>
+			<th class="main">To</th>
+			<th class="main">Subject</th>
+			<th class="infos">Since</th>
+		</tr>
+	</thead>
+	<tbody>
+#{list items:messages, as:'message'}
+		<tr>
+			<td class="main">${message.to.name}</td>
+			<td class="main">${message.subject}</td>
+			<td class="infos">${message.at.since()}</td>
+		</tr>
+#{/list}
+	</tbody>
+</table>

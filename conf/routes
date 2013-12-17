@@ -1,0 +1,68 @@
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
+
+# Import Secure routes
+*		/		module:secure
+
+# Import CRUD routes
+*		/admin	module:crud
+
+# Home
+GET		/		Application.index
+
+# Forums
+GET		/forums						forum.Forums.index
+GET		/forums/{<[0-9]+>forumId}	forum.Forums.show
+
+# Topics
+GET		/forums/{<[0-9]+>forumId}/newTopic											forum.Topics.post
+POST	/forums/{<[0-9]+>forumId}/topics											forum.Topics.create
+GET		/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}							forum.Topics.show
+GET		/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/reply					forum.Topics.reply
+POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}							forum.Topics.createReply
+POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/delete					forum.Topics.delete
+POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/lock						forum.Topics.lock
+POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/hide						forum.Topics.hide
+POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/move/{<[0-9]+>toForumId}	forum.Topics.move
+
+# Registration/Authentication
+GET		/captcha			Application.captcha
+GET		/signup				forum.Users.signup
+POST	/signup				forum.Users.register
+GET		/signup/{uuid}		forum.Users.confirmRegistration
+GET		/confirmation/{uuid}	forum.Users.resendConfirmation
+# Users
+GET		/users				forum.Users.index
+GET		/profile			forum.Users.profile
+POST	/profile			forum.Users.update
+GET		/forgottenPassword	forum.Users.forgottenPassword
+POST	/forgottenPassword	forum.Users.sendPassword
+GET		/forgottenEmail		forum.Users.forgottenEmail
+POST	/forgottenEmail		forum.Users.showEmail
+GET		/users/{<[0-9]+>id}	forum.Users.show
+
+# Attachments
+GET		/attachments/{<[0-9]+>attachmentId}	forum.Attachments.download
+
+# Leaderboard
+GET		/scores				openttd.Scores.index
+GET		/scores/{period}	openttd.Scores.show
+GET		/scores/exportCSV	openttd.Scores.exportAsCSV
+
+# Leaderboard
+GET		/openttd			openttd.Openttd.index
+POST	/openttd/start		openttd.Openttd.start
+POST	/openttd/stop		openttd.Openttd.stop
+
+# static files
+GET		/favicon.ico		staticFile:/public/images/favicon.ico
+GET		/robots.txt			staticFile:/public/robots.txt
+
+# static dirs
+GET		/images/			staticDir:public/images
+GET		/public/			staticDir:public
+
+# Catch all
+*		/{controller}			{controller}.index
+*		/{controller}/{action}	{controller}.{action}

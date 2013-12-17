@@ -1,0 +1,58 @@
+#{extends 'main.html' /}
+
+<div id="breadcrumb">
+	<a href="@{forum.Forums.index}">Forums</a> →
+</div>
+
+<h1 id="title">${category.name}</h1>
+<p class="light">
+	<strong>
+		#{pluralize size:category.postsCount, word:'post' /} in #{pluralize size:category.topicsCount, word:'topic' /}
+	</strong>
+</p>
+
+#{pagination page:page ?: 1, size:category.forumsCount /}
+
+<table id="topics-list">
+	<thead>
+		<tr>
+			<th>Forum</th>
+			<th>Topics</th>
+			<th>Posts</th>
+			<th>Last Post</th>
+		</tr>
+	</thead>
+	#{list items:category.getForums(page ?: 1, pageSize), as:'forum'}
+		<tr>
+			<td class="main">
+				<a href="@{forum.Forums.show(forum.id, 1)}">${forum.name}</a>
+			</td>
+			<td class="infos count">
+				${forum.topicsCount}
+			</td>
+			<td class="infos count">
+				${forum.postsCount}
+			</td>
+			<td class="infos">
+			#{if forum.lastPost}
+				${forum.lastPost.postedAt.since()} <br /> 
+				by <strong>${forum.lastPost.postedBy.name}</strong> (<a href="@{forum.Topics.show(forum.id, forum.lastPost.topic.id, forum.lastPost.topic.postsCount.page(pageSize))}">view</a>)
+			#{/if}
+			</td>
+		</tr>
+	#{/list}
+</table>
+
+#{if connected?.admin}
+	<div id="youreadmin">
+		Administrator options
+	</div>
+
+	<div class="box">
+		<h2>Delete this category</h2>
+		<form action="@{Categories.delete(category.id)}" method="POST">
+			<input type="submit" value="Delete it !" id="deleteIt" />
+		</form>
+	</div>
+#{/if}
+

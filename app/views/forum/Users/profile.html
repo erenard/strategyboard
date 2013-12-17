@@ -1,0 +1,26 @@
+#{extends 'main.html' /}
+
+<form id="userform" action="@{forum.Users.update}" method="POST" accept-charset="${_response_encoding}">
+	<p>
+		<label>Current password - <span class="light">Please enter your password.</span></label>
+		<input type="password" name="password" value="${flash.password}" id="password" />
+		<span class="error">#{error 'password' /}</span>
+	</p>
+	<p>
+		<label for="email">Email - <span class="light">We will send you an email for confirmation.</span></label>
+		<input type="text" name="email" value="${user.email}" id="email" />
+		<span class="error">#{error 'email' /}</span>
+		<label for="email2">Email confirmation</label>
+		<input type="text" name="email2" value="${user.email}" id="email2" />
+		<span class="error">#{error 'email2' /}</span>
+	</p>
+	<p>
+		<label>New password - <span class="light">It must be at least 5 character long.</span></label>
+		<input type="password" name="newPassword" value="${flash.newPassword}" id="newPassword" /> <span class="error">#{error 'newPassword' /}</span>
+		<label>New password confirmation</label>
+		<input type="password" name="newPassword2" value="${flash.newPassword2}" id="newPassword2" /> <span class="error">#{error 'newPassword2' /}</span>
+	</p>
+	<p class="buttons">
+		<input type="submit" value="Update" id="updateButton" />
+	</p>	
+</form>

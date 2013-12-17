@@ -1,0 +1,5 @@
+%{ for(attachment in _arg) { }%
+	<div class="attachment">
+		<a href="@{forum.Attachments.download(attachment.id)}">${attachment.filename}</a>#{if attachment.description}: ${attachment.description}#{/if}#{if attachment.downloads}, #{pluralize size:attachment.downloads, word:'download' /}#{/if}.
+	</div>
+%{ } }%

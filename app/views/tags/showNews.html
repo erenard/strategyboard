@@ -1,0 +1,8 @@
+<div class="news">
+	<div class="content">
+		<div class="postedIn">${_arg.postedAt.format('MM/dd, yyyy hh:mma')} - ${_arg.subject}</div>
+		${_arg.content.nl2br().raw()}
+		#{attachments _arg.attachments /}
+	</div>
+</div>
+<hr class="nextNews" />

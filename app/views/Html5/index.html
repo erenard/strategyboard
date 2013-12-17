@@ -1,0 +1,21 @@
+#{extends 'main.html' /} #{set title: 'HTML5 and WebGL' /}
+<h1 id="title">HTML5 and WebGL</h1>
+<p class="light">
+	<strong>Demos of these two amazing technologies</strong>
+</p>
+
+<p>
+You need a <a href="http://en.wikipedia.org/wiki/WebGL#Implementation">recent browser</a> to visualize these pages, as well as up-to-date video drivers.<br/>
+Google Chrome shows the best performances.
+</p>
+
+<h2 style="clear: both;">Game of life</h2>
+<p>
+	<a href="@{Html5.life}"><img src="/public/html5/life.png" alt="canvas" width="133" height="100" border="0"></a>
+	A conway's game of life using HTML5 canvas and javascript.
+</p>
+<h2 style="clear: both;">Mandelbrot fractal</h2>
+<p>
+	<a href="@{Html5.mandelbrot}"><img src="/public/html5/mandelbrot.png" alt="webgl" width="133" height="100" border="0"></a>
+	A mandelbrot fractal rendering using WebGL's pixel shader. <a href="https://www.google.com/chrome">Google Chrome</a> is strongly recommended.
+</p>

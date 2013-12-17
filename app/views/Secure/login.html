@@ -1,0 +1,40 @@
+#{extends 'main.html' /}
+
+<h1 id="title">Login</h1>
+<p class="light">
+    Please enter you email address and password.
+</p>
+
+
+<div id="userform">
+#{form @authenticate()}
+	#{if flash.errorDetail}
+		<p class="error">
+			&{flash.errorDetail}
+		</p>
+	#{/if}
+	<p>
+		<label for="username">Email</label>
+		<input type="text" name="username" value="${flash.email}" id="email" />
+		<a href="@{forum.Users.forgottenEmail}">I have forgotten my email</a>
+	</p>
+	<p>
+		<label for="password">Password</label>
+		<input type="password" name="password" value="" id="password" />
+		<a href="@{forum.Users.forgottenPassword}">I have forgotten my password</a>
+	</p>
+	<p id="remember-field">
+		<input type="checkbox" name="remember" id="remember" value="true" ${flash.remember ? 'checked="true"' : ''} />
+		<label for="remember" style="display: inline;">&{'secure.remember'}</label>
+	</p>
+	<p id="signin-field" class="buttons">
+		<input type="submit" id="signin" value="&{'secure.signin'}" />
+	</p>
+#{/form}
+</div>
+
+#{if flash.notconfirmed}
+	<p>
+		<a class="action" href="@{forum.Users.resendConfirmation(flash.notconfirmed)}">Resend a confirmation email</a>
+	</p>
+#{/if}

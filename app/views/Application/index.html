@@ -1,0 +1,14 @@
+#{extends 'main.html' /}
+#{set title:'Home' /}
+<h1 id="title">News</h1>
+<div class="rightPageContainer">
+#{miniOpenTTDStatus openTTDStatus /}
+#{if connectedUser}
+#{ingameLogin connectedUser /}
+#{/if}
+#{miniLeaderBoard playerScores /}
+</div>
+#{list items:news, as:'topic'}
+#{showNews topic.firstPost /}
+#{/list}
+#{pagination page:page ?: 1, size:10 /}

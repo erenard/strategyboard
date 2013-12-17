@@ -1,0 +1,21 @@
+<table>
+<thead>
+<tr>
+<th>Since</th>
+<th>Scenario</th>
+<th>Won by</th>
+</tr>
+</thead>
+<tbody>
+#{list items:_arg, as:'playedGame'}
+<tr>
+<td>${playedGame.end.since()}</td>
+<td><img src="${playedGame.scenario.trainImage}" alt="scenarioTrain" align="middle">&nbsp;${playedGame.scenario.name}</td>
+<td>
+#{if playedGame.winner}<a href="@{forum.Users.show(playedGame.winner.player.id)}">${playedGame.winner.player.name}</a> with ${playedGame.winner.points} points#{/if}
+#{else}Anonymous#{/else}
+</td>
+</tr>
+#{/list}
+</tbody>
+</table>

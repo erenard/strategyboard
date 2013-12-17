@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+    <head>
+        <title>Strategyboard - #{get 'title' /}</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=${_response_encoding}"/>
+        <meta name="TITLE" content="Strategyboard OpenTTD Goal Server"/>
+        <meta name="DESCRIPTION" content="Strategyboard is an OpenTTD Goal Server, forum and leaderboard"/>
+        <meta name="KEYWORDS" content="OpenTTD,Goal,Server,LeaderBoard,Forum"/>
+        <meta name="SUBJECT" content="Strategyboard is an OpenTTD Goal Server, forum and leaderboard"/>
+        <meta name="CATEGORY" content="OpenTTD Game Goal Server"/>
+        <meta name="REVISIT-AFTER" content="15 DAYS"/>
+        <meta name="LANGUAGE" content="EN"/>
+        <meta name="ROBOTS" content="All"/>
+        
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/reset.css'}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/default.css'}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/layout.css'}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/forums.css'}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/topics.css'}" />
+        <link rel="stylesheet" type="text/css" media="screen" href="@{'/public/stylesheets/users.css'}" />
+        
+        <link rel="shortcut icon" type="image/gif" href="@{'/public/images/favicon.gif'}" />
+    </head>
+    <body>
+	
+		<div id="main">
+	
+			<div id="header">
+				#{if connectedUser}
+					<p>
+						Welcome <a class="connectedUser" href="@{forum.Users.profile()}">${connectedUser.name}</a>
+						#{if connectedUser.newMessagesCount > 0}, you have ${connectedUser.newMessagesCount} new messages#{/if}
+						(<a href="@{Secure.logout}">Logout</a>)
+					</p>
+				#{/if}
+				#{else}
+					<p>
+						Still not a member ? <a href="@{forum.Users.signup}">Signup</a>.
+						Or if you already have an account, just <a href="@{Secure.login}">Login</a>.
+					</p>
+				#{/else}
+				<ul id="menu">
+					#{secure.check 'administrator'}
+					<li><a href="@{CRUD.index}">Administration</a></li>
+					<li><a href="@{GreenScript.configure}">Greenscript</a></li>
+					#{/secure.check}
+					<li><a class="${request?.controller == 'Application' ? 'selected' : ''}" href="@{Application.index}">News</a></li>
+					<li><a class="${request?.controller == 'openttd.Openttd' ? 'selected' : ''}" href="@{openttd.Openttd.index}">OpenTTD</a></li>
+					<li><a class="${request?.controller == 'openttd.Scores' ? 'selected' : ''}" href="@{openttd.Scores.index}">Scores</a></li>
+					<li><a class="${request?.controller == 'forum.Forums' || request?.controller == 'Topics' ? 'selected' : ''}" href="@{forum.Forums.index}">Forums</a></li>
+					<li><a class="${request?.controller == 'forum.Users' ? 'selected' : ''}" href="@{forum.Users.index}">Members</a></li>
+					<li><a class="${request?.controller == 'Html5' ? 'selected' : ''}" href="@{Html5.index}">HTML5</a></li>
+				</ul>
+			</div>
+			
+			<div id="content">
+				#{if flash.error}
+					<div class="error">${flash.error}</div>
+				#{/if}
+				
+				#{if flash.success}
+					<div class="success">${flash.success}</div>
+				#{/if}
+				
+	       		#{doLayout /}
+			</div>
+			
+			<div id="footer">
+				<p>
+					This website was made with the <a href="http://www.playframework.org">Play framework</a>
+				</p>
+			</div>
+		
+		</div>
+		
+    </body>
+</html>
