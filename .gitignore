@@ -5,6 +5,7 @@
 !.gitignore
 
 # Ignore Play! working directory #
+conf/application.conf
 db
 eclipse
 lib
