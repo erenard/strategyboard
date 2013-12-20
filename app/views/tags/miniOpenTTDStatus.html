@@ -1,19 +1,19 @@
-<table>
-	<thead>
-		<tr><th colspan="2"><a href="@{openttd.Openttd.index}">OpenTTD server</a></th></tr>
-	</thead>
-	<tbody>
-		#{if _arg}
-		<tr><td>Version</td><td>${_arg.revision}</td></tr>
-		<tr><td>Started</td><td>${_arg.startedDate}</td></tr>
-		<tr><td>Current</td><td>${_arg.currentDate}</td></tr>
-		<tr><td>Companies</td><td>${_arg.companiesCount}/${_arg.companiesCapacity}</td></tr>
-		<tr><td>Clients</td><td>${_arg.clientsCount}/${_arg.clientsCapacity}</td></tr>
-		#{/if}
-		#{else}
-		<tr><td colspan="2">
-			Server is down :(
-		</td></tr>
-		#{/else}
-	</tbody>
-</table>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title"><a href="@{openttd.Openttd.index}">OpenTTD server</a></h3>
+  </div>
+  <table class="table">
+	#{if _arg}
+	<tr><td>Version</td><td>${_arg.revision}</td></tr>
+	<tr><td>Started</td><td>${_arg.startedDate}</td></tr>
+	<tr><td>Current</td><td>${_arg.currentDate}</td></tr>
+	<tr><td>Companies</td><td>${_arg.companiesCount}/${_arg.companiesCapacity}</td></tr>
+	<tr><td>Clients</td><td>${_arg.clientsCount}/${_arg.clientsCapacity}</td></tr>
+	#{/if}
+	#{else}
+	<tr><td colspan="2">
+		Server is down :(
+	</td></tr>
+	#{/else}
+  </table>
+</div>

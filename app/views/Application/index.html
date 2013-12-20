@@ -1,14 +1,20 @@
 #{extends 'main.html' /}
 #{set title:'Home' /}
-<h1 id="title">News</h1>
-<div class="rightPageContainer">
-#{miniOpenTTDStatus openTTDStatus /}
-#{if connectedUser}
-#{ingameLogin connectedUser /}
-#{/if}
-#{miniLeaderBoard playerScores /}
+<div class="page-header">
+	<h1>News</h1>
 </div>
-#{list items:news, as:'topic'}
-#{showNews topic.firstPost /}
-#{/list}
+<div class="row">
+	<div class="col-xs-12 col-sm-9">
+		#{list items:news, as:'topic'}
+		<div class="well">
+		#{showNews topic.firstPost /}
+		</div>
+		#{/list}
+	</div><!--/span-->
+	<div class="col-xs-6 col-sm-3 affix-top" id="sidebar">
+		#{miniOpenTTDStatus openTTDStatus /}
+		#{if connectedUser} #{ingameLogin connectedUser /} #{/if}
+		#{miniLeaderBoard playerScores /}
+	</div><!--/span-->
+</div><!--/row-->
 #{pagination page:page ?: 1, size:10 /}

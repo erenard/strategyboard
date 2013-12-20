@@ -1,16 +1,16 @@
 %{ nbPages = _size.page(_caller.pageSize) }%
 
 #{if nbPages > 1}
-	<div class="pagination">Pages :
+<ul class="pagination">
 	%{ for (i in 1..nbPages) { }%
 	#{if (nbPages <= 5) || (i == 1) || (i == nbPages) || (i % 5 == 0) || (Math.abs(i - _page) <= 2)}
 		#{if _page == i}
-			<strong>${i}</strong>
+			<li class="active"><a href="#">${i}</a></li>
 		#{/if}
 		#{else}
-			<a href="${request.path}?page=${i}">${i}</a>
+			<li><a href="${request.path}?page=${i}">${i}</a></li>
 		#{/else}
 	#{/if}
 	%{ } }%
-	</div>
+</ul>
 #{/if}

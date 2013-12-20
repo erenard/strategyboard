@@ -1,10 +1,10 @@
-<table>
-	<thead>
-		<tr><th colspan="2"><a href="@{openttd.Scores.index}">This month scores</a></th></tr>
-	</thead>
-	<tbody>
+<div class="panel panel-default">
+	<div class="panel-heading">
+		<h3 class="panel-title"><a href="@{openttd.Scores.index}">This month scores</a></h3>
+	</div>
+	<table class="table">
 	#{list items:_arg, as: 'score'}
 	<tr><td><a href="@{forum.Users.show(score.player.id)}">${score.player.name}</a></td><td align="right">${score.points}</td></tr>
 	#{/list}
-	</tbody>
-</table>
+	</table>
+</div>

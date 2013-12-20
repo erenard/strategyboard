@@ -1,13 +1,13 @@
-<table>
-	<thead>
-		<tr><th>In game login</th></tr>
-	</thead>
-	<tbody>
-		#{if _arg}
-		<tr><td align="center">!login ${_arg.uuid}</td></tr>
-		#{/if}
-		#{else}
-		<tr><td><a href="@{Secure.login}">Login</a></td></tr>
-		#{/else}
-	</tbody>
-</table>
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">In game login</h3>
+  </div>
+  <div class="panel-body">
+	#{if _arg}
+	!login ${_arg.uuid}
+	#{/if}
+	#{else}
+	<a href="@{Secure.login}">Login</a>
+	#{/else}
+  </div>
+</div>

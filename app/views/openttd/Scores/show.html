@@ -1,28 +1,18 @@
 #{extends 'main.html' /}
-<h1 id="title">Scores</h1>
-<p class="light">
-	#{pluralize size:nbScores, word:'score' /}
-</p>
+<div class="page-header">
+	<h1>Scores</h1>
+	<div class="btn-group">
+	<a href="@{openttd.Scores.show('last_month', 1)}" class="btn btn-default #{if period == 'last_month'}active#{/if}">last month</a>
+	<a href="@{openttd.Scores.show('forever', 1)}" class="btn btn-default #{if period == 'forever'}active#{/if}">forever</a>
+	</div>
+</div>
 #{secure.check 'moderator'}
 <p><a href="@{openttd.Scores.exportAsCSV}">Export as CSV</a></p>
 #{/secure.check}
-<p>
-<b>Period :</b> 
-#{if period == 'last_month'}
-<strong>last month</strong>
-#{/if}
-#{else}
-<a href="@{openttd.Scores.show('last_month', 1)}">last month</a>
-#{/else}
-#{if period == 'forever'}
-<strong>forever</strong>
-#{/if}
-#{else}
-<a href="@{openttd.Scores.show('forever', 1)}">forever</a>
-#{/else}
-</p>
-#{pagination page:page ?: 1, size:nbScores /}
-<table id="users-list">
+<p>#{pluralize size:nbScores, word:'score' /}</p>
+<p>#{pagination page:page ?: 1, size:nbScores /}</p>
+<div class="panel panel-default">
+<table id="users-list" class="table">
 	<thead>
 		<tr>
 			<th>#</th>
@@ -33,12 +23,7 @@
 	</thead>
 	<tbody>
 	#{list items:playerScores, as: 'score'}
-	#{if score.index % 3 == 0}
-		<tr style="background: #EEEEEE;">
-	#{/if}
-	#{else}
 		<tr>
-	#{/else}
 			<td>${score.index}
 			</td>
 			<td>
@@ -50,3 +35,4 @@
 	#{/list}
 	</tbody>
 </table>
+</div>
