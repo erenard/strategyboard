@@ -1,6 +1,10 @@
-<h3>${_arg.postedAt.format('MM/dd, yyyy hh:mma')} - ${_arg.subject}</h3>
-<p>
-${_arg.content.nl2br().raw()}
-#{attachments _arg.attachments /}
-</p>
-<hr/>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <span class="pull-right">${_arg.postedAt.format('MM/dd, yyyy hh:mma')}</span>
+        ${_arg.subject}
+    </div>
+    <div class="panel-body">
+        ${_arg.content.nl2br().raw()}
+        #{attachments _arg.attachments /}
+    </div>
+</div>
