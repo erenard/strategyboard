@@ -1,26 +1,26 @@
 #{extends 'main.html' /}
-
-<form id="userform" action="@{forum.Users.update}" method="POST" accept-charset="${_response_encoding}">
-	<p>
-		<label>Current password - <span class="light">Please enter your password.</span></label>
-		<input type="password" name="password" value="${flash.password}" id="password" />
-		<span class="error">#{error 'password' /}</span>
-	</p>
-	<p>
-		<label for="email">Email - <span class="light">We will send you an email for confirmation.</span></label>
-		<input type="text" name="email" value="${user.email}" id="email" />
-		<span class="error">#{error 'email' /}</span>
-		<label for="email2">Email confirmation</label>
-		<input type="text" name="email2" value="${user.email}" id="email2" />
-		<span class="error">#{error 'email2' /}</span>
-	</p>
-	<p>
-		<label>New password - <span class="light">It must be at least 5 character long.</span></label>
-		<input type="password" name="newPassword" value="${flash.newPassword}" id="newPassword" /> <span class="error">#{error 'newPassword' /}</span>
-		<label>New password confirmation</label>
-		<input type="password" name="newPassword2" value="${flash.newPassword2}" id="newPassword2" /> <span class="error">#{error 'newPassword2' /}</span>
-	</p>
-	<p class="buttons">
-		<input type="submit" value="Update" id="updateButton" />
-	</p>	
+#{set title: 'My profile'/}
+#{set subtitle: 'Update your user information' /}
+<form id="userform" action="@{forum.Users.update}" method="POST" accept-charset="${_response_encoding}" role="form">
+    <div class="form-group #{ifError 'password'}has-error#{/ifError}">
+        <label class="control-label" for="password">Current password #{error 'password' /}</label>
+        <input type="text" name="password" class="form-control" placeholder="Please enter your password."/>
+    </div>
+    <div class="form-group #{ifError 'email'}has-error#{/ifError}">
+        <label class="control-label" for="email">Email, we will send you an email for confirmation. #{error 'email' /}</label>
+        <input type="text" name="email" value="${user.email}" class="form-control" placeholder="Email"/>
+    </div>
+    <div class="form-group #{ifError 'email2'}has-error#{/ifError}">
+        <label class="control-label" for="email2">Email confirmation #{error 'email2' /}</label>
+        <input type="text" name="email2" value="${user.email}" class="form-control" placeholder="Email"/>
+    </div>
+    <div class="form-group #{ifError 'newPassword'}has-error#{/ifError}">
+        <label class="control-label" for="newPassword">New password, it must be at least 5 character long. #{error 'newPassword' /}</label>
+        <input type="text" name="newPassword" value="${flash.newPassword}" class="form-control" placeholder="Email"/>
+    </div>
+    <div class="form-group #{ifError 'newPassword2'}has-error#{/ifError}">
+        <label class="control-label" for="newPassword2">New password confirmation #{error 'newPassword2' /}</label>
+        <input type="text" name="newPassword2" value="${flash.newPassword2}" class="form-control" placeholder="Email"/>
+    </div>
+    <button type="submit" class="btn btn-info">Update</button>
 </form>

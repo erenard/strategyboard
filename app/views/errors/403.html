@@ -1,17 +1,14 @@
 #{extends 'main.html' /}
-
-<h1 id="title">Forbidden</h1>
-<p class="light">
-	You don't have the permission to access this page.
-</p>
+#{set title: 'Forbidden'/}
+#{set subtitle: "You don't have the permission to access this page."/}
 
 #{if connected}
-	<p>
-		Please <a href="@{Secure.login}">login</a> as administrator.
-	</p>
+<p>
+    Please <a href="@{Secure.login}">login</a> as administrator.
+</p>
 #{/if}
 #{else}
-	<p>
-		Please <a href="@{Secure.login}">login</a>.
-	</p>
+<p>
+    Please <a href="@{Secure.login}">login</a>.
+</p>
 #{/else}

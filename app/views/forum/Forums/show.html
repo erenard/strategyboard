@@ -1,27 +1,26 @@
 #{extends 'main.html' /}
 #{set title: forum.name /}
-<div id="breadcrumb">
-	<a href="@{forum.Forums.index}">Forums</a> →
-</div>
-
-<h1 id="title">${forum.name}</h1>
-<p class="light">
-	<strong>
-		#{pluralize size:postsCount, word:'post' /} in #{pluralize size:topicsCount, word:'topic' /}
-	</strong>
-</p>
-
+#{set 'subtitle'}
+#{pluralize size:postsCount, word:'post' /} in #{pluralize size:topicsCount, word:'topic' /}
+#{/set}
+<ol class="breadcrumb">
+    <li><a href="@{forum.Forums.index}">Forums</a></li>
+    <li class="active">${forum.name}</li>
+</ol>
 #{secure.check 'poster'}
 #{ifnot forum.locked}
-	<div id="newTopic">
-		<a class="action" href="@{forum.Topics.post(forum.id)}">Post a new topic</a>
-	</div>
+<a class="btn btn-info" href="@{forum.Topics.post(forum.id)}">Post a new topic</a>
 #{/ifnot}
 #{/secure.check}
+#{secure.check 'moderator'}
+<a class="btn btn-danger" href="@{forum.Forums.lock(forum.id)}">(Un)lock</a>
+#{/secure.check}
 
+<div class="container">
 #{pagination page:page ?: 1, size:topicsCount /}
+</div>
 
-<table id="topics-list">
+<table class="table table-striped">
 	<thead>
 		<tr>
 			<th>Topics</th>
@@ -53,13 +52,3 @@
 		</tr>
 	#{/list}
 </table>
-
-#{secure.check 'moderator'}
-	<div id="youreadmin">Moderation options</div>
-	<div class="box">
-		<h2>Lock this forum</h2>
-		<form action="@{forum.Forums.lock(forum.id)}" method="POST">
-			<input type="submit" value="(Un)lock" id="lockIt" />
-		</form>
-	</div>
-#{/secure.check}

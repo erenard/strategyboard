@@ -1,19 +1,19 @@
 #{extends 'main.html' /}
-
-<div id="breadcrumb">
-	<a href="@{forum.Forums.index}">Forums</a> → <a href="@{forum.Forums.show(topic.forum.id)}">${topic.forum.name}</a> → <a href="@{forum.Topics.show(topic.forum.id, topic.id)}">${topic.firstPost.subject}</a>
-</div>
-
-<h1 id="title">Reply to «${topic.firstPost.subject}»</h1>
-<p class="light">
-	by ${connectedUser.name}
-</p>
-
-<form id="post" action="@{forum.Topics.createReply(topic.forum.id, topic.id)}" method="POST" accept-charset="${_response_encoding}">
-	<p>
-		<textarea name="content" rows="8" cols="40" id="contentText"></textarea>
-	</p>
-	<p class="buttons">
-		<input type="submit" value="Post the reply" id="postReply" /> or <a class="action" href="@{forum.Topics.show(topic.forum.id, topic.id)}">cancel</a>
-	</p>
+#{set title: 'Reply to «'+topic.firstPost.subject+'»' /}
+#{set subtitle: 'by '+connectedUser.name/}
+<ol class="breadcrumb">
+    <li><a href="@{forum.Forums.index}">Forums</a></li>
+    <li><a href="@{forum.Forums.show(topic.forum.id)}">${topic.forum.name}</a></li>
+    <li><a href="@{forum.Topics.show(topic.forum.id, topic.id)}">${topic.firstPost.subject}</a></li>
+    <li class="active">#{get 'title' /}</li>
+</ol>
+<form role="form" action="@{forum.Topics.createReply(topic.forum.id, topic.id)}" method="POST" accept-charset="${_response_encoding}">
+    <div class="form-group #{ifError 'content'}has-error#{/ifError}">
+        <label class="control-label" for="content">Content #{error 'content' /}</label>
+        <textarea name="content" rows="8" class="form-control" id="contentText">${flash.content}</textarea>
+    </div>
+    <div class="btn-group">
+        <button type="submit" class="btn btn-info">Post the reply</button>
+        <a class="btn btn-primary" href="@{forum.Topics.show(topic.forum.id, topic.id)}">Cancel</a>
+    </div>
 </form>

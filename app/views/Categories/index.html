@@ -1,11 +1,8 @@
 #{extends 'main.html' /}
-
-<h1 id="title">Categories</h1>
-<p class="light">
-	<strong>
-		#{pluralize size:forumsCount, word:'forum' /} in #{pluralize size:categoriesCount, word:'category' /}
-	</strong>
-</p>
+#{set title:'Categories' /}
+#{set 'subtitle'}
+#{pluralize size:forumsCount, word:'forum' /} in #{pluralize size:categoriesCount, word:'category' /}
+#{/set}
 
 <table id="categories-list">
 	<thead>

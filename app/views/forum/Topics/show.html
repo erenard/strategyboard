@@ -1,15 +1,13 @@
 #{extends 'main.html' /}
 #{set title: topic.firstPost.subject /}
-<div id="breadcrumb">
-	<a href="@{forum.Forums.index}">Forums</a> → <a href="@{forum.Forums.show(topic.forum.id)}">${topic.forum.name}</a>
-</div>
-
-<h1 id="title">${topic.firstPost.subject}</h1>
-<p class="light">
-	<strong>
-		#{pluralize size:topic.postsCount, word:'post' /} by #{pluralize size:topic.voicesCount, word:'user' /}
-	</strong>
-</p>
+#{set 'subtitle'}
+#{pluralize size:topic.postsCount, word:'post' /} by #{pluralize size:topic.voicesCount, word:'user' /}
+#{/set}
+<ol class="breadcrumb">
+    <li><a href="@{forum.Forums.index}">Forums</a></li>
+    <li><a href="@{forum.Forums.show(topic.forum.id)}">${topic.forum.name}</a></li>
+    <li class="active">#{get 'title'/}</li>
+</ol>
 
 #{pagination page:page ?: 1, size:topic.postsCount /}
 
@@ -19,23 +17,11 @@
 
 #{secure.check 'replyer'}
 #{ifnot topic.locked}
-	<p>
-		<a class="action" href="@{forum.Topics.reply(topic.forum.id, topic.id)}">Reply</a>
-	</p>
+<a class="btn btn-info" href="@{forum.Topics.reply(topic.forum.id, topic.id)}">Reply</a>
 #{/ifnot}
 #{/secure.check}
 
 #{secure.check 'moderator'}
-	<div id="youreadmin">Moderation options</div>
-
-	<div class="box">
-		<h2>Lock this topic</h2>
-		<form action="@{forum.Topics.lock(topic.forum.id, topic.id)}" method="POST">
-			<input type="submit" value="(Un)lock" id="lockIt" />
-		</form>
-		<h2>Hide this topic</h2>
-		<form action="@{forum.Topics.hide(topic.forum.id, topic.id)}" method="POST">
-			<input type="submit" value="(Un)hide" id="hideIt" />
-		</form>
-	</div>
+<a class="btn btn-danger" href="@{forum.Topics.lock(topic.forum.id, topic.id)}">(Un)lock</a>
+<a class="btn btn-danger" href="@{forum.Topics.hide(topic.forum.id, topic.id)}">(Un)hide</a>
 #{/secure.check}

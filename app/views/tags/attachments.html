@@ -1,5 +1,9 @@
+#{if _arg}
+<div class="well">
 %{ for(attachment in _arg) { }%
-	<div class="attachment">
-		<a href="@{forum.Attachments.download(attachment.id)}">${attachment.filename}</a>#{if attachment.description}: ${attachment.description}#{/if}#{if attachment.downloads}, #{pluralize size:attachment.downloads, word:'download' /}#{/if}.
-	</div>
+<span class="glyphicon glyphicon-file"></span>
+<a href="@{forum.Attachments.download(attachment.id)}">${attachment.filename}</a>#{if attachment.description}: ${attachment.description}#{/if}#{if attachment.downloads}, #{pluralize size:attachment.downloads, word:'download' /}#{/if}.
+<br/>
 %{ } }%
+</div>
+#{/if}

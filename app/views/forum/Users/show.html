@@ -1,30 +1,20 @@
 #{extends 'main.html' /}
-
-<div id="breadcrumb">
-	<a href="@{forum.Users.index}">Users</a> →
-</div>
-
-<h1 id="title">${user.name}</h1>
-<p class="light">
-	#{pluralize size:user.gamesCount, word:'game' /}
-</p>
-
+#{set title: user.name /}
+#{set 'subtitle'}
+#{pluralize size:user.gamesCount, word:'game' /}, #{pluralize size:user.postsCount, word:'post' /} in #{pluralize size:user.topicsCount, word:'topic' /}
+#{/set}
+<ol class="breadcrumb">
+    <li><a href="@{forum.Users.index}">Members</a></li>
+    <li class="active">#{get 'title'/}</li>
+</ol>
 #{if user.recentsGames}
-	#{showRecentGames user.recentsGames/}
+    <h3>Recents games ...</h3>
+    #{showRecentGames user.recentsGames/}
 #{/if}
-
-<p class="light">
-	#{pluralize size:user.postsCount, word:'post' /} in #{pluralize size:user.topicsCount, word:'topic' /}
-</p>
-
 #{if user.recentsPosts}
-	<h2>Recents posts ...</h2>
+	<h3>Recents posts ...</h3>
 
 	#{list items:user.recentsPosts, as:'post'}
 		#{showPost arg:post, showTopic:true /}
 	#{/list}
 #{/if}
-
-#{else}
-	<h2>No post by this user</h2>
-#{/else}

@@ -1,9 +1,6 @@
 #{extends 'main.html' /}
-
-<h1 id="title">${user.name}</h1>
-<p class="light">
-	<strong>Outbox</strong>
-</p>
+#{set title: user.name/}
+#{set subtitle: 'Inbox'/}
 
 <table>
 	<thead>

@@ -1,38 +1,38 @@
 #{extends 'main.html' /}
-<div class="page-header">
-	<h1>Scores</h1>
-	<div class="btn-group">
-	<a href="@{openttd.Scores.show('last_month', 1)}" class="btn btn-default #{if period == 'last_month'}active#{/if}">last month</a>
-	<a href="@{openttd.Scores.show('forever', 1)}" class="btn btn-default #{if period == 'forever'}active#{/if}">forever</a>
-	</div>
+#{set title: 'Scores'/}
+#{set 'subtitle'}
+#{pluralize size:nbScores, word:'score' /}
+#{/set}
+<div class="btn-group">
+    <a href="@{openttd.Scores.show('last_month', 1)}" class="btn btn-default #{if period == 'last_month'}active#{/if}">last month</a>
+    <a href="@{openttd.Scores.show('forever', 1)}" class="btn btn-default #{if period == 'forever'}active#{/if}">forever</a>
 </div>
 #{secure.check 'moderator'}
-<p><a href="@{openttd.Scores.exportAsCSV}">Export as CSV</a></p>
+<a class="btn btn-danger" href="@{openttd.Scores.exportAsCSV}">Export as CSV</a>
 #{/secure.check}
-<p>#{pluralize size:nbScores, word:'score' /}</p>
 <p>#{pagination page:page ?: 1, size:nbScores /}</p>
 <div class="panel panel-default">
-<table id="users-list" class="table">
-	<thead>
-		<tr>
-			<th>#</th>
-			<th>Name</th>
-			<th>Points</th>
-			<th>Games</th>
-		</tr>
-	</thead>
-	<tbody>
-	#{list items:playerScores, as: 'score'}
-		<tr>
-			<td>${score.index}
-			</td>
-			<td>
-				<a href="@{forum.Users.show(score.player.id)}">${score.player.name}</a>
-			</td>
-			<td>${score.points}</td>
-			<td>${score.gameCount}</td>
-		</tr>
-	#{/list}
-	</tbody>
-</table>
+    <table id="users-list" class="table table-striped">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Name</th>
+                <th>Points</th>
+                <th>Games</th>
+            </tr>
+        </thead>
+        <tbody>
+            #{list items:playerScores, as: 'score'}
+            <tr>
+                <td>${score.index}
+                </td>
+                <td>
+                    <a href="@{forum.Users.show(score.player.id)}">${score.player.name}</a>
+                </td>
+                <td>${score.points}</td>
+                <td>${score.gameCount}</td>
+            </tr>
+            #{/list}
+        </tbody>
+    </table>
 </div>

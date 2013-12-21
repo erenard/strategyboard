@@ -1,13 +1,10 @@
 #{extends 'main.html' /}
-
-<h1 id="title">Users</h1>
-<p class="light">
-	#{pluralize size:nbUsers, word:'user' /}
-</p>
-
+#{set title: 'Members' /}
+#{set 'subtitle'}
+#{pluralize size:nbUsers, word:'user' /}
+#{/set}
 #{pagination page:page ?: 1, size:nbUsers /}
-
-<table id="users-list">
+<table class="table table-striped">
 	<thead>
 		<tr>
 			<th class="main">User name</th>

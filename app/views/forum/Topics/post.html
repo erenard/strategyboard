@@ -1,24 +1,24 @@
 #{extends 'main.html' /}
-
-<div id="breadcrumb">
-	<a href="@{forum.Forums.index}">Forums</a> → <a href="@{forum.Forums.show(forum.id)}">${forum.name}</a>
-</div>
-
-<h1 id="title">New topic</h1>
-<p class="light">
-	by ${connectedUser.name}
-</p>
-
-<form id="post" action="@{forum.Topics.create(forum.id)}" method="POST" accept-charset="${_response_encoding}">
-	<p>
-		<label>Subject</label>
-		<input type="text" name="subject" value="" id="subject" /> <span class="error">#{error 'subject' /}</span>
-	</p>
-	<p>
-		<label>Content</label>
-		<textarea name="content" rows="8" cols="40" id="contentText">${flash.content}</textarea>
-	</p>
-	<p>
-		<input type="submit" value="Create this topic" id="postTopic" /> or <a class="action" href="@{forum.Forums.show(forum.id)}">cancel</a>
-	</p>
+#{set title: 'New topic' /}
+#{set 'subtitle'}
+by ${connectedUser.name}
+#{/set}
+<ol class="breadcrumb">
+    <li><a href="@{forum.Forums.index}">Forums</a></li>
+    <li><a href="@{forum.Forums.show(forum.id)}">${forum.name}</a></li>
+    <li class="active">#{get 'title'/}</li>
+</ol>
+<form id="post" action="@{forum.Topics.create(forum.id)}" method="POST" accept-charset="${_response_encoding}" role="form">
+    <div class="form-group #{ifError 'subject'}has-error#{/ifError}">
+        <label class="control-label" for="subject">Username #{error 'subject' /}</label>
+        <input type="text" name="subject" class="form-control" placeholder="Username"/>
+    </div>
+    <div class="form-group #{ifError 'content'}has-error#{/ifError}">
+        <label class="control-label" for="content">Content #{error 'content' /}</label>
+        <textarea name="content" rows="8" class="form-control" id="contentText">${flash.content}</textarea>
+    </div>
+    <div class="btn-group">
+        <button type="submit" class="btn btn-info">Create this topic</button>
+        <a class="btn btn-primary" href="@{forum.Forums.show(forum.id)}">Cancel</a>
+    </div>
 </form>

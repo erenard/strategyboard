@@ -1,15 +1,12 @@
 #{extends 'main.html' /}
-
-<div id="breadcrumb">
-	<a href="@{forum.Forums.index}">Forums</a> →
-</div>
-
-<h1 id="title">${category.name}</h1>
-<p class="light">
-	<strong>
-		#{pluralize size:category.postsCount, word:'post' /} in #{pluralize size:category.topicsCount, word:'topic' /}
-	</strong>
-</p>
+#{set title: category.name /}
+#{set 'subtitle'}
+#{pluralize size:category.postsCount, word:'post' /} in #{pluralize size:category.topicsCount, word:'topic' /}
+#{/set}
+<ol class="breadcrumb">
+    <li><a href="@{forum.Forums.index}">Forums</a></li>
+    <li class="active">${category.name}</li>
+</ol>
 
 #{pagination page:page ?: 1, size:category.forumsCount /}
 

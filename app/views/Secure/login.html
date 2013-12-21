@@ -1,43 +1,37 @@
 #{extends 'main.html' /}
-
-<div class="page-header">
-    <h1>Login</h1>
-</div>
-
-<p class="light">
-    Please enter you email address and password.
-</p>
-
-
-<div id="userform">
+#{set title:'Login'/}
+#{set subtitle:'Please enter you email address and password.'/}
 #{form @authenticate()}
-	#{if flash.errorDetail}
-		<p class="error">
-			&{flash.errorDetail}
-		</p>
-	#{/if}
-	<p>
-		<label for="username">Email</label>
-		<input type="text" name="username" value="${flash.email}" id="email" />
-		<a href="@{forum.Users.forgottenEmail}">I have forgotten my email</a>
-	</p>
-	<p>
-		<label for="password">Password</label>
-		<input type="password" name="password" value="" id="password" />
-		<a href="@{forum.Users.forgottenPassword}">I have forgotten my password</a>
-	</p>
-	<p id="remember-field">
-		<input type="checkbox" name="remember" id="remember" value="true" ${flash.remember ? 'checked="true"' : ''} />
-		<label for="remember" style="display: inline;">&{'secure.remember'}</label>
-	</p>
-	<p id="signin-field" class="buttons">
-		<input type="submit" id="signin" value="&{'secure.signin'}" />
-	</p>
+    #{if flash.errorDetail}
+    <div class="alert alert-danger">
+        &{flash.errorDetail}
+    </div>
+    #{/if}
+    <div class="form-group">
+        <label for="username">Email</label>
+        <input type="email" name="username" value="${flash.email}" id="email" class="form-control" placeholder="Email" />
+    </div>
+    <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" name="password" value="" id="password" class="form-control" placeholder="Password"/>
+    </div>
+    <div class="checkbox">
+        <label>
+            <input type="checkbox" name="remember" id="remember" value="true" ${flash.remember ? 'checked="true"' : ''}> &{'secure.remember'}
+        </label>
+    </div>
+    <button type="submit" class="btn btn-primary">&{'secure.signin'}</button>
+    <div class="btn-group">
+        <button type="button" class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+        I have forgotten ! <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" role="menu">
+            <li><a href="@{forum.Users.forgottenEmail}">my email</a></li>
+            <li><a href="@{forum.Users.forgottenPassword}">my password</a></li>
+        </ul>
+    </div>
 #{/form}
-</div>
-
 #{if flash.notconfirmed}
-	<p>
-		<a class="action" href="@{forum.Users.resendConfirmation(flash.notconfirmed)}">Resend a confirmation email</a>
-	</p>
+<a class="btn btn-warning" href="@{forum.Users.resendConfirmation(flash.notconfirmed)}">Resend me a confirmation email</a>
 #{/if}
+

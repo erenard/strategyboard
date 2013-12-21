@@ -1,22 +1,14 @@
 #{extends 'main.html' /}
-
-<h1 id="title">Email retrieval</h1>
-<p class="light">
-	Please enter your pseudo and password.
-</p>
-
-<form id="userform" action="@{forum.Users.showEmail}" method="POST" accept-charset="${_response_encoding}">
-	<p>
-		<label>Pseudo</label>
-		<input type="text" name="pseudo"/>
-		<span class="error">#{error 'pseudo' /}</span>
-	</p>
-	<p>
-		<label>Password</label>
-		<input type="password" name="password"/>
-		<span class="error">#{error 'password' /}</span>
-	</p>
-	<p class="buttons">
-		<input type="submit" value="Show my email" />
-	</p>	
+#{set title: 'Email retrieval' /}
+#{set subtitle: 'Please enter your pseudo and password.' /}
+<form id="userform" action="@{forum.Users.showEmail}" method="POST" accept-charset="${_response_encoding}" role="form">
+    <div class="form-group #{ifError 'pseudo'}has-error#{/ifError}">
+        <label class="control-label" for="pseudo">Username #{error 'pseudo' /}</label>
+        <input type="text" name="pseudo" class="form-control" placeholder="Username"/>
+    </div>
+    <div class="form-group #{ifError 'password'}has-error#{/ifError}">
+        <label class="control-label" for="password">Password #{error 'password' /}</label>
+        <input type="text" name="password" class="form-control" placeholder="Password"/>
+    </div>
+    <button type="submit" class="btn btn-info" >Show my email</button>
 </form>

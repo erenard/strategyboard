@@ -1,43 +1,42 @@
 #{extends 'main.html' /}
-#{set title: 'OpenTTD' /}
-<div class="jumbotron">
-	<h1>OpenTTD server</h1>
-	#{showOpenTTDStatus openTTDStatus /}
-</div>
-
+#{set title: 'OpenTTD server' /}
 <div class="row">
-	<div class="col-xs-12 col-sm-9">
-		<div class="panel panel-default">
-			<div class="panel-heading">
-			  <h3 class="panel-title">Recent games ...</h3>
-			</div>
-			#{showRecentGames lastPlayedGames /}
-		</div>
-		<div class="panel panel-default">
-			<div class="panel-heading">
-			  <h3 class="panel-title">Best games ...</h3>
-			</div>
-			#{showRecentGames bestPlayedGames /}
-		</div>
-	</div><!--/span-->
-	<div class="col-xs-6 col-sm-3 affix-top" id="sidebar">
-		#{ingameLogin connectedUser /}
-		#{miniLeaderBoard playerScores /}
-		#{secure.check 'moderator'}
-		<div class="panel panel-danger">
-			<div class="panel-heading">
-			  <h3 class="panel-title">Moderation options</h3>
-			</div>
-			<div class="panel-body">
-				<p>OpenTTD Server</p>
-				<form action="@{openttd.Openttd.start()}" method="POST" style="display: inline;">
-					<input type="submit" value="Start" />
-				</form>
-				<form action="@{openttd.Openttd.stop()}" method="POST" style="display: inline;">
-					<input type="submit" value="Stop" />
-				</form>
-			</div>
-		</div>
-		#{/secure.check}
-	</div><!--/span-->
+    <div class="col-xs-12 col-sm-9">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">OpenTTD server status</h3>
+            </div>
+            #{showOpenTTDStatus openTTDStatus /}
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Recent games ...</h3>
+            </div>
+            #{showRecentGames lastPlayedGames /}
+        </div>
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Best games ...</h3>
+            </div>
+            #{showRecentGames bestPlayedGames /}
+        </div>
+    </div><!--/span-->
+    <div class="col-xs-6 col-sm-3 affix-top" id="sidebar">
+        #{ingameLogin connectedUser /}
+        #{miniLeaderBoard playerScores /}
+        #{secure.check 'moderator'}
+        <div class="panel panel-danger">
+            <div class="panel-heading">
+                <h3 class="panel-title">Moderation options</h3>
+            </div>
+            <div class="panel-body">
+                <p>OpenTTD Server</p>
+                <div class="btn-group">
+                    <a class="btn btn-default" href="@{openttd.Openttd.start()}">Start</a>
+                    <a class="btn btn-default" href="@{openttd.Openttd.stop()}">Stop</a>
+                </div>
+            </div>
+        </div>
+        #{/secure.check}
+    </div><!--/span-->
 </div><!--/row-->
