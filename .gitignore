@@ -6,6 +6,7 @@
 
 # Ignore Play! working directory #
 conf/application.conf
+conf/openttd
 db
 eclipse
 lib
