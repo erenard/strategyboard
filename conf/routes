@@ -12,36 +12,36 @@
 GET		/		Application.index
 
 # Forums
-GET		/forums				forum.Forums.index
-GET		/forums/{<[0-9]+>forumId}	forum.Forums.show
+GET		/forums							forum.Forums.index
+GET		/forums/{<[0-9]+>forumId}		forum.Forums.show
 GET		/forums/{<[0-9]+>forumId}/lock	forum.Forums.lock
 
 # Topics
-GET	/forums/{<[0-9]+>forumId}/newTopic						forum.Topics.post
+GET		/forums/{<[0-9]+>forumId}/newTopic						forum.Topics.post
 POST	/forums/{<[0-9]+>forumId}/topics						forum.Topics.create
-GET	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}				forum.Topics.show
+GET		/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}				forum.Topics.show
 POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}				forum.Topics.createReply
-GET	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/reply			forum.Topics.reply
+GET		/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/reply			forum.Topics.reply
 POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/delete			forum.Topics.delete
-GET	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/lock				forum.Topics.lock
+GET		/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/lock				forum.Topics.lock
 POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/hide				forum.Topics.hide
 POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/move/{<[0-9]+>toForumId}	forum.Topics.move
 
 # Registration/Authentication
-GET	/captcha		Application.captcha
-GET	/signup			forum.Users.signup
+GET		/captcha		Application.captcha
+GET		/signup			forum.Users.signup
 POST	/signup			forum.Users.register
-GET	/signup/{uuid}		forum.Users.confirmRegistration
-GET	/confirmation/{uuid}	forum.Users.resendConfirmation
+GET		/signup/{uuid}		forum.Users.confirmRegistration
+GET		/confirmation/{uuid}	forum.Users.resendConfirmation
 # Users
-GET	/users			forum.Users.index
-GET	/profile		forum.Users.profile
+GET		/users			forum.Users.index
+GET		/profile		forum.Users.profile
 POST	/profile		forum.Users.update
-GET	/forgottenPassword	forum.Users.forgottenPassword
+GET		/forgottenPassword	forum.Users.forgottenPassword
 POST	/forgottenPassword	forum.Users.sendPassword
-GET	/forgottenEmail		forum.Users.forgottenEmail
+GET		/forgottenEmail		forum.Users.forgottenEmail
 POST	/forgottenEmail		forum.Users.showEmail
-GET	/users/{<[0-9]+>id}	forum.Users.show
+GET		/users/{<[0-9]+>id}	forum.Users.show
 
 # Attachments
 GET		/attachments/{<[0-9]+>attachmentId}	forum.Attachments.download
@@ -53,8 +53,8 @@ GET		/scores/exportCSV	openttd.Scores.exportAsCSV
 
 # Leaderboard
 GET		/openttd			openttd.Openttd.index
-GET	/openttd/start		openttd.Openttd.start
-GET	/openttd/stop		openttd.Openttd.stop
+GET		/openttd/start		openttd.Openttd.start
+GET		/openttd/stop		openttd.Openttd.stop
 
 # static files
 GET		/favicon.ico		staticFile:/public/images/favicon.ico
