@@ -2,42 +2,64 @@
 #{set title: 'Mandelbrot fractal' /}
 #{set subtitle: 'Rendered with WebGL shaders' /}
 <ol class="breadcrumb">
-    <li><a href="@{Html5.index}">HTML5</a></li>
-    <li class="active">#{get 'title'/}</li>
+	<li><a href="@{Html5.index}">HTML5</a></li>
+	<li class="active">#{get 'title'/}</li>
 </ol>
 <div class="row">
 	<div class="col-md-4 col-sm-12">
 		<div class="panel panel-default">
 			<div class="panel-heading">
-                <h3 class="panel-title">Controls</h3>
-            </div>
-            <div class="panel-body">
-            	<div class="btn-group">
-            	<button class="btn btn-default" id="increaseIteration">Increase</button><button class="btn btn-default" id="decreaseIteration">decrease</button> the maximum number of iteration: <span id="maxIteration" style="font-weight: bold">64</span>
-            	</div>
-				<p><input type="button" value="Increase" id="increaseIteration"> or <button id="decreaseIteration">decrease</button> the maximum number of iteration: <span id="maxIteration" style="font-weight: bold">64</span></p>
-				<p>Actual zoom: x<span id="scale" style="font-weight: bold">1</span></p>
-				Click to change the color palette: 
-				<div id="selectionPalette" style="position: absolute;">
-					<div class="colorPalette" id="paletteBlueYellow" style="background-image: url('/public/html5/mandelbrot/paletteBlueYellow.png'); width: 256px; height: 16px;"></div>
-					<div class="colorPalette" id="paletteFrequency"  style="background-image: url('/public/html5/mandelbrot/paletteFrequency.png'); width: 256px; height: 16px;"></div>
-					<div class="colorPalette" id="paletteHue"        style="background-image: url('/public/html5/mandelbrot/paletteHue.png'); width: 256px; height: 16px;"></div>
-					<div class="colorPalette" id="paletteRedGreen"   style="background-image: url('/public/html5/mandelbrot/paletteRedGreen.png'); width: 256px; height: 16px;"></div>
-					<div class="colorPalette" id="paletteRedYellow"  style="background-image: url('/public/html5/mandelbrot/paletteRedYellow.png'); width: 256px; height: 16px;"></div>
-					<div class="colorPalette" id="paletteWavelength" style="background-image: url('/public/html5/mandelbrot/paletteWavelength.png'); width: 256px; height: 16px;"></div>
+				<h3 class="panel-title">
+					Iterations limit: <span id="maxIteration" style="font-weight: bold">64</span>
+				</h3>
+			</div>
+			<div class="panel-body">
+				<div class="btn-group">
+					<button class="btn btn-default" id="increaseIteration">Increase</button>
+					<button class="btn btn-default" id="decreaseIteration">decrease</button>
 				</div>
-				<div id="selectedPalette" style="background-image: url('/public/html5/mandelbrot/paletteRedYellow.png'); width: 256px; height: 16px; cursor: pointer;"></div>
-				<div class="well">Drag and drop to navigate, use the mouse wheel to zoom in and out !</div>
-            </div>
+			</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					Actual zoom: <strong>x<span id="scale">1</span></strong>
+				</h3>
+			</div>
+			<div class="panel-body">Drag and drop to navigate, use the
+				mouse wheel to zoom in and out !</div>
+		</div>
+		<div class="panel panel-default">
+			<div class="panel-heading">
+				<h3 class="panel-title">
+					Color palette
+				</h3>
+			</div>
+			<div class="panel-body">
+			<p>Click to change the color palette:</p>
+			<div id="selectionPalette" style="position: absolute; display: none;">
+				<div class="colorPalette" id="paletteBlueYellow" style="background-image: url('/public/html5/mandelbrot/paletteBlueYellow.png');"></div>
+				<div class="colorPalette" id="paletteFrequency" style="background-image: url('/public/html5/mandelbrot/paletteFrequency.png');"></div>
+				<div class="colorPalette" id="paletteHue" style="background-image: url('/public/html5/mandelbrot/paletteHue.png');"></div>
+				<div class="colorPalette" id="paletteRedGreen" style="background-image: url('/public/html5/mandelbrot/paletteRedGreen.png');"></div>
+				<div class="colorPalette" id="paletteRedYellow" style="background-image: url('/public/html5/mandelbrot/paletteRedYellow.png');"></div>
+				<div class="colorPalette" id="paletteWavelength" style="background-image: url('/public/html5/mandelbrot/paletteWavelength.png');"></div>
+			</div>
+			<div class="colorPalette" id="selectedPalette" style="background-image: url('/public/html5/mandelbrot/paletteRedYellow.png');"></div>
+			</div>
 		</div>
 	</div>
 	<div class="col-md-8 col-sm-12">
 		<div class="panel panel-default">
-			<div class="panel-body">
-				<canvas id="mycanvas" width="640" height="480" style="display: inline-block; cursor: move;"></canvas>
+			<div class="panel-body text-center">
+				<canvas id="mycanvas" width="576" height="432"
+					style="display: inline-block; cursor: move;"></canvas>
 			</div>
 		</div>
 	</div>
 </div>
+<style type="text/css">
+div.colorPalette {width: 256px; height: 16px; cursor: pointer;}
+</style>
 <script type="text/javascript" src="/public/html5/mandelbrot/resources.js"></script>
 <script type="text/javascript" src="/public/html5/mandelbrot/mandelbrot.js"></script>

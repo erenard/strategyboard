@@ -30,6 +30,7 @@
 			mouseWheelHandler = function (event) {
 				var wheel;
 				event.stopPropagation();
+				//event.preventDefault();
 				if (modelComponent !== null) {
 					wheel = event.detail ? -1 * event.detail : event.wheelDelta / 40;
 					if (wheel > 0) {
@@ -38,6 +39,7 @@
 						modelComponent.decreaseScale();
 					}
 				}
+				return false;
 			};
 		//Color palette selection initialisation
 		selectionPaletteElement.style.display = 'none';
@@ -104,7 +106,7 @@
 			update : function (maxIteration, modelScale) {
 				scale = modelScale;
 				maxIterationElement.innerHTML = Math.floor(maxIteration);
-				scaleElement.innerHTML = scale >= 1 ? Math.floor(scale) : Math.round(scale * 100) / 100;
+				scaleElement.innerHTML = scale >= 10 ? Math.floor(scale) : Math.round(scale * 100) / 100;
 			},
 			dragOffset : dragOffset,
 			translate : translate
@@ -351,12 +353,10 @@
 				maxIteration = Math.max(maxIteration, 64);
 			},
 			increaseScale : function () {
-				window.console.log('In');
 				targetScale += targetScale * 0.1;
 				targetScale = Math.min(targetScale, 65535);
 			},
 			decreaseScale : function () {
-				window.console.log('Out');
 				targetScale -= targetScale * 0.1;
 				targetScale = Math.max(targetScale, 0.5);
 			},
