@@ -45,7 +45,7 @@ public class Application extends Controller {
 
 	public static void captcha(String id) {
 		Images.Captcha captcha = Images.captcha();
-		String code = captcha.getText("#444444");
+		String code = captcha.getText("#aaaaaa");
 		Cache.set(id, code, "10mn");
 		renderBinary(captcha);
 	}

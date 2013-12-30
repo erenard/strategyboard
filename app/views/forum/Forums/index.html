@@ -4,34 +4,40 @@
 #{pluralize size:postsCount, word:'post' /} in #{pluralize size:topicsCount, word:'topic' /}
 #{/set}
 #{list items:categories, as:'category'}
-<table class="table table-striped">
-    <thead>
-        <tr>
-            <th class="main">${category.name}</th>
-            <th class="infos">Last post</th>
-        </tr>
-    </thead>
-
-    #{list items:category.forums, as:'forum'}
-    <tr>
-        <td class="main">
-            <a href="@{forum.Forums.show(forum.id)}">${forum.name}</a>
-            <p class="light">
-                #{pluralize size:forum.postsCount, word:'post' /} in #{pluralize size:forum.topicsCount, word:'topic' /}
-            </p>
-            ${forum.description}
-        </td>
-        <td class="infos">
-            #{if forum.lastPost}
-            ${forum.lastPost.postedAt.since()} <br /> 
-            by <strong>${forum.lastPost.postedBy.name}</strong> 
-            (<a href="@{forum.Topics.show(forum.id, forum.lastPost.topic.id, forum.lastPost.topic.postsCount.page(pageSize))}">view</a>)
-            #{/if}
-            #{else}
-            No post
-            #{/else}
-        </td>
-    </tr>
-    #{/list}
-</table>
+<div class="panel panel-default">
+    <div class="panel-heading">
+        <h3 class="panel-title">${category.name}</h3>
+    </div>
+	<table class="table table-striped">
+	    <thead>
+	        <tr>
+	            <th>Forum</th>
+	            <th>Last post</th>
+	        </tr>
+	    </thead>
+		<tbody>
+	    #{list items:category.forums, as:'forum'}
+		    <tr>
+		        <td class="main">
+		            <a href="@{forum.Forums.show(forum.id)}">${forum.name}</a>
+		            <p class="light">
+		                #{pluralize size:forum.postsCount, word:'post' /} in #{pluralize size:forum.topicsCount, word:'topic' /}
+		            </p>
+		            ${forum.description}
+		        </td>
+		        <td class="infos">
+		            #{if forum.lastPost}
+		            ${forum.lastPost.postedAt.since()} <br /> 
+		            by <strong>${forum.lastPost.postedBy.name}</strong> 
+		            (<a href="@{forum.Topics.show(forum.id, forum.lastPost.topic.id, forum.lastPost.topic.postsCount.page(pageSize))}">view</a>)
+		            #{/if}
+		            #{else}
+		            No post
+		            #{/else}
+		        </td>
+		    </tr>
+	    #{/list}
+	    </tbody>
+	</table>
+</div>
 #{/list}
