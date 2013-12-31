@@ -93,8 +93,8 @@
 			var moveX, moveY;
 			event.stopPropagation();
 			if (dragStart.x !== null) {
-				moveX = event.clientX - dragStart.x;
-				moveY = event.clientY - dragStart.y;
+				moveX = dragStart.x - event.clientX;
+				moveY = dragStart.y - event.clientY;
 				dragOffset.x = (2 / scale) * (moveX / canvasElement.width);
 				dragOffset.y = (-2 / scale) * (moveY / canvasElement.height);
 			}
@@ -242,10 +242,10 @@
 					gl.useProgram(program);
 				}
 			},
-			setUniform1i : function (uniform, value1i) {
+			getUniformLocation : function (uniform) {
 				var location = gl.getUniformLocation(program, uniform);
-				if (location !== -1) {
-					gl.uniform1i(location, value1i);
+				if (location && location !== -1) {
+					return location;
 				} else {
 					throw 'UniformLocation of ' + uniform + ' not found';
 				}
@@ -272,10 +272,14 @@
 	};
 
 	mandelbrot.model = function (webGL, userInterface) {
-		var textureCoords = new Float32Array([
-				-2.0, 2.0,
+		var vertices = new Float32Array([
+				1, 1,
+				-1, 1,
+				1, -1,
+				-1, -1
+			]),
+		    textureCoords = new Float32Array([
 				2.0, 2.0,
-				2.0, -2.0,
 				-2.0, 2.0,
 				2.0, -2.0,
 				-2.0, -2.0
@@ -286,6 +290,7 @@
 			targetScale = 1,
 			maxIteration = 64,
 			colorTexture = null,
+			uniform = {},
 			glColorPalette = function (name) {
 				var resource = resources.get(name);
 				if (resource) {
@@ -298,29 +303,27 @@
 
 					gl.activeTexture(gl.TEXTURE0);
 					gl.bindTexture(gl.TEXTURE_2D, colorTexture);
-					webGL.setUniform1i("colorPalette", 0);
+					gl.uniform1i(uniform.colorPalette, 0);
 				}
 			},
 			draw = function () {
-				var translateX = userInterface.translate.x + userInterface.dragOffset.x,
-					translateY = userInterface.translate.y + userInterface.dragOffset.y,
-					minX = (translateX - 1.0) * scale,
-					maxX = (translateX + 1.0) * scale,
-					minY = (translateY - 1.0) * scale * aspect,
-					maxY = (translateY + 1.0) * scale * aspect,
-					vertices = new Float32Array([
-						minX, maxY,
-						maxX, maxY,
-						maxX, minY,
-						minX, maxY,
-						maxX, minY,
-						minX, minY
-					]);
-				webGL.setAttribFloatArray("aVertexPosition", vertices, 2);
-				webGL.setUniform1i("maxIteration", maxIteration);
+				var translateX = 2 * (userInterface.translate.x + userInterface.dragOffset.x),
+					translateY = 2 * (userInterface.translate.y + userInterface.dragOffset.y),
+					aspectScale = scale * aspect,
+					minX = (translateX * scale - 2.0) / scale,
+					maxX = (translateX * scale + 2.0) / scale,
+					minY = (translateY * scale - 2.0) / aspectScale,
+					maxY = (translateY * scale + 2.0) / aspectScale;
+				textureCoords = new Float32Array([
+					maxX, maxY,
+					minX, maxY,
+					maxX, minY,
+					minX, minY
+				]);
+				webGL.setAttribFloatArray("aTexturePosition", textureCoords, 2);
+				gl.uniform1i(uniform.maxIteration, maxIteration);
 				gl.clear(gl.COLOR_BUFFER_BIT);
-				gl.drawArrays(gl.TRIANGLES, 0, 6);
-
+				gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 			},
 			animate = function () {
 				scale += (targetScale - scale) / 2;
@@ -332,7 +335,11 @@
 		webGL.compileVertexShader(resources.get('mandelbrotVertex'));
 		webGL.compileFragmentShader(resources.get('mandelbrotFragment'));
 		webGL.linkShaders();
-		webGL.setAttribFloatArray("aTexturePosition", textureCoords, 2);
+		uniform = {
+			colorPalette: webGL.getUniformLocation("colorPalette"),
+			maxIteration: webGL.getUniformLocation("maxIteration")
+		};
+		webGL.setAttribFloatArray("aVertexPosition", vertices, 2);
 		glColorPalette('paletteRedYellow');
 		that = {
 			loop : function () {
@@ -354,7 +361,7 @@
 			},
 			increaseScale : function () {
 				targetScale += targetScale * 0.1;
-				targetScale = Math.min(targetScale, 65535);
+				targetScale = Math.min(targetScale, 65535 * 2);
 			},
 			decreaseScale : function () {
 				targetScale -= targetScale * 0.1;
