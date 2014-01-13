@@ -22,3 +22,8 @@ test-result
 server.pid
 *.iml
 *.eml
+
+build.*
+www.zip
+nbproject
+pscp.sh
