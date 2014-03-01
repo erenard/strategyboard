@@ -193,49 +193,65 @@
 		var ctx = canvas.getContext('2d'),
 			lastRender = new Date(),
 			fpsElement = document.getElementById('fps'),
-			sprites = {}, //Sprites storage
 			sizeX = grid.size.x,
 			sizeY = grid.size.y,
 			cells = grid.getCells(),
 			/**
 			 * prepare a cell's sprite and store it for a later use
-			 * @param {Number} size : sprite's pixel size
 			 * @param {String} color : fill style
 			 */
-			sprite = function (size, color) {
+			sprite = function (color) {
 				var sprite = window.document.createElement('canvas'),
 					context;
-				sprite.setAttribute('width', size + 'px');
-				sprite.setAttribute('height', size + 'px');
+				sprite.setAttribute('width', (size - 1) + 'px');
+				sprite.setAttribute('height', (size - 1) + 'px');
 				context = sprite.getContext('2d');
 				context.fillStyle = color;
-				context.beginPath();
-				context.moveTo(0.1, 0.1);
-				context.lineTo(size * 0.9, 0.1);
-				context.lineTo(size * 0.9, size * 0.9);
-				context.lineTo(0.1, size * 0.9);
-				context.closePath();
+				context.rect(0, 0, size, size);
 				context.fill();
 				return sprite;
 			},
+			yngCellSprite = sprite("rgba(0, 127, 0, 1)"),
+			oldCellSprite = sprite("rgba(127, 255, 127, 1)"),
+			dedCellSprite = sprite("rgba(0, 0, 0, 1)"),
 			/** draws the game board with each cells */
 			render = function () {
-				var x, y, collumn, cell, color;
-				ctx.clearRect(0, 0, canvas.width, canvas.height);
-				for (x = 0; x < sizeX; x = x + 1) {
+				var x, y, collumn, cell;
+				//ctx.clearRect(0, 0, canvas.width, canvas.height);
+				x = sizeX;
+				while (x--) {
 					collumn = cells[x];
-					for (y = 0; y < sizeY; y = y + 1) {
+					y = sizeY;
+					while (y--) {
 						cell = collumn[y];
-						if (cell.state === 1) {
-							color = cell.color();
-							if (sprites[color] === undefined) {
-								sprites[color] = sprite(size, color);
+						if (cell.flip) {
+							cell.flip = false;
+							if (cell.state === 0) {
+								ctx.drawImage(yngCellSprite, x * size, y * size);
+								cell.age = 0;
+								cell.state = 1;
+							} else {
+								ctx.drawImage(dedCellSprite, x * size, y * size);
+								cell.age = -1;
+								cell.state = 0;
 							}
-							ctx.drawImage(sprites[color], x * size, y * size);
+						} else {
+							cell.age += cell.state;
+							if (cell.age === 5) {
+								ctx.drawImage(oldCellSprite, x * size, y * size);
+							}
 						}
 					}
 				}
-			};
+			},
+			times = new Array(),
+			totalTime = 0;
+			/// disable image smoothing for sake of speed
+			ctx.webkitImageSmoothingEnabled = false;
+			ctx.mozImageSmoothingEnabled = false;
+			ctx.msImageSmoothingEnabled = false;
+			ctx.oImageSmoothingEnabled = false;
+			ctx.imageSmoothingEnabled = false;  ///future...
 		/* This function will wrap the whole process of updating the game and drawing it */
 		return function () {
 			var now = new Date(),
@@ -244,7 +260,13 @@
 				grid.update();
 				render();
 				if (fpsElement !== null) {
-					fpsElement.innerHTML = Math.floor(1000 / time);
+					totalTime += time;
+					times.push(time);
+					if (times.length > 60) {
+						time = times.shift();
+						totalTime -= time;
+					}
+					fpsElement.innerHTML = (times.length * 1000 / totalTime) | 0;
 				}
 				lastRender = now;
 			}
@@ -262,35 +284,31 @@
 			survival = userInterface.rules.s,
 			/** Game of life algorithm */
 			compute = function () {
-				var xm1 = cells[sizeX - 1], //column x minus 1
-					xs0 = cells[0], //column x
-					xp1 = cells[1], //column x plus 1
+				var xm1 = cells[sizeX - 2], //column x minus 1
+					xs0 = cells[sizeX - 1], //column x
+					xp1 = cells[0], //column x plus 1
 					ym1, //index y minus 1
 					yp1, //index y plus 1
+					cell, //current cell
+					isAlive, //current cell state
 					count, //neighboring cells count
 					x, //index x
 					y; //index y
 				/* Phase 1, plant new cells and mark cells for death where appropriate */
-				for (x = 0; x < sizeX; x = x + 1) {
-					for (y = 0; y < sizeY; y = y + 1) {
+				x = sizeX;
+				while (x--) {
+					y = sizeY;
+					while (y--) {
 						ym1 = y > 0 ? y - 1 : sizeY - 1;
 						yp1 = y < (sizeY - 1) ? y + 1 : 0;
 						count = xm1[ym1].state + xs0[ym1].state + xp1[ym1].state + xm1[y].state + xp1[y].state + xm1[yp1].state + xs0[yp1].state + xp1[yp1].state;
-						if (xs0[y].state === 1 && !survival[count]) {
-							xs0[y].nextState = 0;
-						} else if (xs0[y].state === 0 && birth[count]) {
-							xs0[y].nextState = 1;
-						}
+						cell = xs0[y];
+						isAlive = cell.state === 1;
+						cell.flip |= (isAlive && !survival[count]) || (!isAlive && birth[count]);
 					}
-					xm1 = xs0;
-					xs0 = xp1;
-					xp1 = cells[x + 2 < sizeX ? x + 2 : 0];
-				}
-				/* Phase 2, update cells */
-				for (x = 0; x < sizeX; x = x + 1) {
-					for (y = 0; y < sizeY; y = y + 1) {
-						cells[x][y].compute();
-					}
+					xp1 = xs0;
+					xs0 = xm1;
+					xm1 = cells[x - 1 > 0 ? x - 2 : sizeX - 1];
 				}
 			},
 			x,
@@ -306,12 +324,13 @@
 				 */
 				random: function (ratio) {
 					var x,
-						y;
+						y,
+						cell;
 					for (x = 0; x < sizeX; x = x + 1) {
 						for (y = 0; y < sizeY; y = y + 1) {
 							if (Math.random() + ratio > 1) {
-								cells[x][y].nextState = 1;
-								cells[x][y].state = 1;
+								cell = cells[x][y];
+								cell.flip |= cell.state !== 1;
 							}
 						}
 					}
@@ -321,11 +340,13 @@
 				 */
 				clear: function () {
 					var x,
-						y;
+						y,
+						cell;
 					for (x = 0; x < sizeX; x = x + 1) {
 						for (y = 0; y < sizeY; y = y + 1) {
-							cells[x][y].nextState = 0;
-							cells[x][y].state = 0;
+							cell = cells[x][y];
+							cell.state = 1;
+							cell.flip = true;
 						}
 					}
 				},
@@ -355,29 +376,11 @@
 	};
 	/**
 	 * Cell
-	 * @param {Number} initialState Initial state of the cell, 0 or 1.
 	 */
-	life.Cell = function (initialState) {
+	life.Cell = function () {
 		this.state = 0;
-		this.nextState = 0;
+		this.flip = false;
 		this.age = -1;
-	};
-	/**
-	 * Make the cell live one turn
-	 * Eventually going to the state 0 (dead)
-	 * Agging if still alive
-	 * @return {boolean} should this cell live another day ?
-	 */
-	life.Cell.prototype.compute = function () {
-		this.state = this.nextState;
-		this.age = this.state === 1 ? this.age + 1 : -1;
-	};
-	/**
-	 * Age based color of the cell
-	 * @returns {String} rgba string of the cell's color
-	 */
-	life.Cell.prototype.color = function () {
-		return this.age > 5 ? "rgba(127, 255, 127, 1)" : "rgba(0, 127, 0, 1)";
 	};
 	return {
 		// ---- launch script -----
@@ -388,9 +391,9 @@
 					canvas = document.getElementById('viewport'),
 					userInterface = life.userInterface(),
 					grid = life.grid(Math.floor(canvas.width / radius), Math.floor(canvas.height / radius), userInterface),
-					renderer = life.renderer(canvas, radius, grid, 1000 / 25),
+					renderer = life.renderer(canvas, radius, grid, 1000 / 100),
 					animation = life.animation(renderer, userInterface);
-				grid.random(0.10);
+				grid.random(0.30);
 				animation.start();
 			}, false);
 		}
