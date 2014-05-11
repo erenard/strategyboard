@@ -44,7 +44,7 @@ public class OpenttdAdminHandler {
 			//robot.addListener(companyLifeCycle);
 			CompanyPasswordRemainder companyPasswordRemainder = new CompanyPasswordRemainder(robot);
 			//robot.addListener(companyPasswordRemainder);
-			ServerAnnouncer serverAnnouncer = new ServerAnnouncer(robot, externalUsers);
+			ServerAnnouncer serverAnnouncer = new ServerAnnouncer(robot);
 			//robot.addListener(serverAnnouncer);
 //			CompanyEconomyObjective companyEconomyObjective = new CompanyEconomyObjective(robot, companyLifeCycle, externalUsers, server.getGoalType(), server.getGoalValue());
 //			robot.addListener(companyEconomyObjective);
