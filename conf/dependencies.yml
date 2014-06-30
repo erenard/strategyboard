@@ -4,4 +4,3 @@ require:
     - play
     - play -> crud
     - play -> secure
-    - play -> greenscript 1.2.8b
