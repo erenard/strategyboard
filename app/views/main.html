@@ -38,7 +38,6 @@
 	    <ul class="nav navbar-nav">
 		#{secure.check 'administrator'}
 		<li><a href="@{CRUD.index}">Administration</a></li>
-		<li><a href="@{GreenScript.configure}">Greenscript</a></li>
 		#{/secure.check}
 		<li class="${request?.controller == 'Application' ? 'active' : ''}"><a href="@{Application.index}">News</a></li>
 		<li class="${request?.controller == 'openttd.Openttd' ? 'active' : ''}"><a href="@{openttd.Openttd.index}">OpenTTD</a></li>
