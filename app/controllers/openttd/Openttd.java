@@ -5,6 +5,9 @@ import java.util.List;
 import controllers.Application;
 import controllers.Check;
 import controllers.Profile;
+import groovy.lang.Closure;
+import java.io.PrintWriter;
+import java.util.Map;
 
 import openttd.OpenttdAdminHandler;
 import openttd.OpenttdServerHandler;
@@ -12,6 +15,7 @@ import openttd.OpenttdServerHandler;
 import models.leaderboard.PlayedGame;
 import models.leaderboard.PlayedGameScore;
 import models.leaderboard.PlayerScore;
+import models.leaderboard.Scenario;
 import models.openttd.OpenttdServer;
 import openttd.OpenttdClientHandler;
 import play.cache.CacheFor;
@@ -26,8 +30,21 @@ public class Openttd extends Application {
 		OpenttdServer openTTDStatus = OpenttdServer.getStatus();
 		List<PlayerScore> playerScores = PlayedGameScore.getLastMonthPlayerScores(1, 10);
 		List<PlayedGame> lastPlayedGames = PlayedGame.getLastPlayedGames();
-		List<PlayedGame> bestPlayedGames = PlayedGame.getBestPlayedGames();
-		render(openTTDStatus, playerScores, lastPlayedGames, bestPlayedGames);
+		List<PlayedGame> bestArticGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.Artic);
+		List<PlayedGame> bestDeserticGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.Desertic);
+		List<PlayedGame> bestHighSpeedGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.HighSpeed);
+		List<PlayedGame> bestSteamGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.Steam);
+		List<PlayedGame> bestToylandGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.Toyland);
+		render(
+				openTTDStatus,
+				playerScores,
+				lastPlayedGames,
+				bestArticGames,
+				bestDeserticGames,
+				bestHighSpeedGames,
+				bestSteamGames,
+				bestToylandGames
+		);
 	}
 	
 	@Check(value = {Profile.MODERATOR})

@@ -33,7 +33,7 @@ public class PlayedGame extends Model {
 	   return find("select p from PlayedGame p order by p.end desc").fetch(10);
    }
    
-   public static List<PlayedGame> getBestPlayedGames() {
-	   return find("select p.playedGame from PlayedGameScore p order by p.achivement desc").fetch(10);
+   public static List<PlayedGame> getBestPlayedGamesForScenarioId(Scenario.Id scenarioId) {
+	   return find("select p.playedGame from PlayedGameScore p where p.playedGame.scenario = " + scenarioId.longValue() + " order by p.achivement desc").fetch(10);
    }
 }
