@@ -1,18 +1,20 @@
 <table class="table table-striped">
 	<thead>
 		<tr>
+			<th>Player</th>
+			<th>Score</th>
 			<th>Since</th>
-			<th>Won by</th>
 		</tr>
 	</thead>
 <tbody>
 #{list items:_arg, as:'playedGame'}
 	<tr>
-		<td>${playedGame.end.since()}</td>
 		<td>
-		#{if playedGame.winner}<a href="@{forum.Users.show(playedGame.winner.player.id)}">${playedGame.winner.player.name}</a> with ${playedGame.winner.points} points#{/if}
+		#{if playedGame.winner}<a href="@{forum.Users.show(playedGame.winner.player.id)}">${playedGame.winner.player.name}</a>{/if}
 		#{else}Anonymous#{/else}
 		</td>
+		<td>#{if playedGame.winner}${playedGame.winner.points}{/if}</td>
+		<td>${playedGame.end.since()}</td>
 	</tr>
 #{/list}
 </tbody>
