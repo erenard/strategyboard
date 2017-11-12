@@ -47,15 +47,15 @@ public class Topic extends Model {
     }
 
     public Long getVoicesCount() {
-        return User.count("select count(distinct u) from User u, Topic t, Post p where p.postedBy = u and p.topic = t and t = ?", this);
+        return User.count("select count(distinct u) from User u, Topic t, Post p where p.postedBy = u and p.topic = t and t = ?1", this);
     }
 
     public Post getFirstPost() {
-       return Post.find("topic = ? order by postedAt asc", this).first();
+       return Post.find("topic = ?1 order by postedAt asc", this).first();
    }
    
     public Post getLastPost() {
-        return Post.find("topic = ? order by postedAt desc", this).first();
+        return Post.find("topic = ?1 order by postedAt desc", this).first();
     }
     
 }

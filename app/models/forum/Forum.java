@@ -53,7 +53,7 @@ public class Forum extends Model {
 	// ~~~~~~~~~~~~
 
 	public long getVisibleTopicsCount() {
-		return Topic.count("forum = ? and hidden = false", this);
+		return Topic.count("forum = ?1 and hidden = false", this);
 	}
 
 	public long getTopicsCount() {
@@ -61,7 +61,7 @@ public class Forum extends Model {
 	}
 
 	public long getVisiblePostsCount() {
-		return Post.count("topic.forum = ? and topic.hidden = false", this);
+		return Post.count("topic.forum = ?1 and topic.hidden = false", this);
 	}
 	
 	public long getPostsCount() {
@@ -69,15 +69,15 @@ public class Forum extends Model {
 	}
 
 	public List<Topic> getVisibleTopics(int page, int pageSize) {
-		return Topic.find("select distinct t from Topic t, Post p where p.topic = t and t.forum = ? and hidden = false order by p.postedAt desc", this).fetch(page, pageSize);
+		return Topic.find("select distinct t from Topic t, Post p where p.topic = t and t.forum = ?1 and hidden = false order by p.postedAt desc", this).fetch(page, pageSize);
 	}
 
 	public List<Topic> getTopics(int page, int pageSize) {
-		return Topic.find("select distinct t from Topic t, Post p where p.topic = t and t.forum = ? order by p.postedAt desc", this).fetch(page, pageSize);
+		return Topic.find("select distinct t from Topic t, Post p where p.topic = t and t.forum = ?1 order by p.postedAt desc", this).fetch(page, pageSize);
 	}
 
 	public Post getLastPost() {
-		return Post.find("topic.forum = ? and topic.hidden = false order by postedAt desc", this).first();
+		return Post.find("topic.forum = ?1 and topic.hidden = false order by postedAt desc", this).first();
 	}
 
 }

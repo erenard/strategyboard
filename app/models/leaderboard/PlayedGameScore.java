@@ -26,7 +26,7 @@ public class PlayedGameScore extends Model {
 	public static PlayerScore getWinner(PlayedGame playedGame) {
 		Query q = Model.em()
 				.createQuery("select cast(score.achivement / score.presenceRatio as int), score from PlayedGameScore score where score.playedGame = ? order by 1 desc");
-		q.setParameter(1, playedGame);
+		q.setParameter(0, playedGame);
 		List<Object[]> results = q.getResultList();
 		for (Object[] result : results) {
 			PlayerScore playerScore = new PlayerScore();
@@ -58,8 +58,8 @@ public class PlayedGameScore extends Model {
 			q.setFirstResult((page - 1) * pageSize);
 			q.setMaxResults(pageSize);
 		}
-		q.setParameter(1, from.getTime());
-		q.setParameter(2, to.getTime());
+		q.setParameter(0, from.getTime());
+		q.setParameter(1, to.getTime());
 		List<Object[]> rows = q.getResultList();
 
 		List<PlayerScore> playerScores = new ArrayList<PlayerScore>(rows.size());
@@ -79,8 +79,8 @@ public class PlayedGameScore extends Model {
 	public static long count(Calendar from, Calendar to) {
 		Query q = Model.em()
 				.createQuery("select distinct score.user from PlayedGameScore score where score.playedGame.end >= ? and score.playedGame.end < ?");
-		q.setParameter(1, from.getTime());
-		q.setParameter(2, to.getTime());
+		q.setParameter(0, from.getTime());
+		q.setParameter(1, to.getTime());
 		return (long) q.getResultList().size();
 	}
 

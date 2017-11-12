@@ -63,7 +63,7 @@ public class User extends Model {
 	// ~~~~~~~~~~~~ 
 
 	public List<Post> getRecentsPosts() {
-		return Post.find("postedBy = ? and topic.hidden = false order by postedAt desc", this).fetch(1, 10);
+		return Post.find("postedBy = ?1 and topic.hidden = false order by postedAt desc", this).fetch(1, 10);
 	}
 
 	public Long getPostsCount() {
@@ -75,23 +75,23 @@ public class User extends Model {
 	}
 
 	public Long getTopicsCount() {
-		return Post.count("select count(distinct t) from Topic t, Post p, User u where p.postedBy = ? and p.topic = t", this);
+		return Post.count("select count(distinct t) from Topic t, Post p, User u where p.postedBy = ?1 and p.topic = t", this);
 	}
 
 	public List<Category> getCategories() {
 		if(this.group.admin) {
 			return Category.findAll();
 		} else {
-			return Category.find("select distinct c from Category c, Permission p where p.category = c and p.group = ? and p.accessLevel > 0", this.group).fetch();
+			return Category.find("select distinct c from Category c, Permission p where p.category = c and p.group = ?1 and p.accessLevel > 0", this.group).fetch();
 		}
 	}
 
 	public List<PlayedGame> getRecentsGames() {
-		return PlayedGameScore.find("select s.playedGame from PlayedGameScore s where s.user = ? order by s.playedGame.end desc", this).fetch(10);
+		return PlayedGameScore.find("select s.playedGame from PlayedGameScore s where s.user = ?1 order by s.playedGame.end desc", this).fetch(10);
 	}
 
 	public Long getNewMessagesCount() {
-		return Message.count("to = ? and readed = false", this);
+		return Message.count("to = ?1 and readed = false", this);
 	}
 
 	// ~~~~~~~~~~~~ 
