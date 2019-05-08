@@ -58,5 +58,6 @@ public class OpenttdServer {
 		this.revision = gameInfo.getServerRevision();
 		this.startedDate = sdf.format(Convert.dayToCalendar(gameInfo.getGameStartDate()).getTime());
 		this.width = gameInfo.getMapWidth();
+		this.goal = "Reach the best company performance in " + OpenttdServerHandler.getInstance().getTimerDuration() + " years to win the game.";
 	}
 }
