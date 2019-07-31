@@ -97,7 +97,7 @@ public class Profile extends Controller {
 					permissions = Permission.findByUserGroupAndCategory(user.group, category);
 				} else {
 					Long forumId = new Long(forumIdString);
-					Forum forum = Forum.find("id = ?1", forumId).first();
+					Forum forum = Forum.find("id = ?0", forumId).first();
 					notFoundIfNull(forum);
 					permissions = Permission.findByUserGroupAndCategory(user.group, forum.category);
 				}

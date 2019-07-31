@@ -31,7 +31,7 @@ public class Permission extends Model {
    }
     
     static public Permission findByUserGroupAndCategory(UserGroup userGroup, Category category) {
-    	return Permission.find("group = ?1 and category = ?2", userGroup, category).first();
+    	return Permission.find("group = ?0 and category = ?1", userGroup, category).first();
     }
     
     @Override

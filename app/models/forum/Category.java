@@ -50,11 +50,11 @@ public class Category extends Model {
 	}
 
 	public List<Forum> getForums(int page, int pageSize) {
-		return Forum.find("category = ?1", this).fetch(page, pageSize);
+		return Forum.find("category = ?0", this).fetch(page, pageSize);
 	}
 
 	public Post getLastPost() {
-		return Post.find("topic.forum.category = ?1 order by postedAt desc",
+		return Post.find("topic.forum.category = ?0 order by postedAt desc",
 				this).first();
 	}
 
@@ -62,7 +62,7 @@ public class Category extends Model {
 
 	public static List<Category> forUser(String email) {
 		return Category.find("select distinct c from Category c, Permission p, UserGroup g, User u " +
-				"where p.category = c and p.group = g and u.group = g and u.email = ?1 and p.accessLevel > 0", email).fetch();
+				"where p.category = c and p.group = g and u.group = g and u.email = ?0 and p.accessLevel > 0", email).fetch();
 	}
 
 }
