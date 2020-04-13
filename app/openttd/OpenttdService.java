@@ -11,6 +11,7 @@ import models.leaderboard.PlayedGameScore;
 import models.leaderboard.Scenario;
 
 import play.Logger;
+import play.db.jpa.JPA;
 import play.db.jpa.JPAPlugin;
 
 import com.openttd.robot.ExternalServices.ExternalGameService;
@@ -23,8 +24,8 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 	@Override
 	public ExternalUser identifyUser(String loginToken) {
 		boolean readonly = true;
-		boolean rollback = true;
-		JPAPlugin.startTx(readonly);
+		final String txName = "identifyUser";
+		JPA.startTx(txName, readonly);
 		try {
 			User user = User.findByUUID(loginToken);
 			if(user != null) {
@@ -36,12 +37,13 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 			}
 			return null;
 		} finally {
-			JPAPlugin.closeTx(rollback);
+			JPA.rollbackTx(txName);
 		}
 	}
 
 	@Override
 	public void saveGame(Collection<GamePlayer> gamePlayers) {
+		final String txName = "saveGame";
 		OpenttdServerHandler server = OpenttdServerHandler.getInstance();
 		long scenarioId = server.getScenarioId();
 		Logger.info("saveGameStat(" + scenarioId + ", " + gamePlayers + ")");
@@ -50,9 +52,7 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 		//Logged user / companies
 		Map<GamePlayer, User> userByGamePlayer = new HashMap<GamePlayer, User>();
 
-		boolean readonly = false;
-		boolean rollback = false;
-		JPAPlugin.startTx(readonly);
+		JPA.startTx(txName, false);
 		try {
 			//Filtrage des companies présentent loggées...
 			for(GamePlayer gamePlayer : gamePlayers) {
@@ -86,10 +86,9 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 				score.user = user;
 				score.create();
 			}
+			JPA.closeTx(txName);
 		} catch(Exception e) {
-			rollback = true;
-		} finally {
-			JPAPlugin.closeTx(rollback);
+			JPA.rollbackTx(txName);
 		}
 		Logger.info("saveGameStat() : Fin");
 	}

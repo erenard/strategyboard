@@ -32,6 +32,7 @@ public class Attachments extends Application {
 			}
 			response.out.flush();
 			response.out.close();
+			fis.close();
 		}
 	}
 }

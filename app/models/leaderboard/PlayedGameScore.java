@@ -25,8 +25,8 @@ public class PlayedGameScore extends Model {
 
 	public static PlayerScore getWinner(PlayedGame playedGame) {
 		Query q = Model.em()
-				.createQuery("select cast(score.achivement / score.presenceRatio as int), score from PlayedGameScore score where score.playedGame = ?0 order by 1 desc");
-		q.setParameter(0, playedGame);
+				.createQuery("select cast(score.achivement / score.presenceRatio as int), score from PlayedGameScore score where score.playedGame = ?1 order by 1 desc");
+		q.setParameter(1, playedGame);
 		List<Object[]> results = q.getResultList();
 		for (Object[] result : results) {
 			PlayerScore playerScore = new PlayerScore();
@@ -53,13 +53,13 @@ public class PlayedGameScore extends Model {
 			to = Calendar.getInstance();
 		}
 		Query q = Model.em()
-				.createQuery("select distinct cast(sum(score.achivement / score.presenceRatio) as int), score.user, count(score) from PlayedGameScore score where score.playedGame.end >= ?0 and score.playedGame.end < ?1 group by score.user order by 1 desc, 3 desc, 2 asc");
+				.createQuery("select distinct cast(sum(score.achivement / score.presenceRatio) as int), score.user, count(score) from PlayedGameScore score where score.playedGame.end >= ?1 and score.playedGame.end < ?2 group by score.user order by 1 desc, 3 desc, 2 asc");
 		if (page != null && pageSize != null) {
 			q.setFirstResult((page - 1) * pageSize);
 			q.setMaxResults(pageSize);
 		}
-		q.setParameter(0, from.getTime());
-		q.setParameter(1, to.getTime());
+		q.setParameter(1, from.getTime());
+		q.setParameter(2, to.getTime());
 		List<Object[]> rows = q.getResultList();
 
 		List<PlayerScore> playerScores = new ArrayList<PlayerScore>(rows.size());
@@ -78,9 +78,9 @@ public class PlayedGameScore extends Model {
 
 	public static long count(Calendar from, Calendar to) {
 		Query q = Model.em()
-				.createQuery("select distinct score.user from PlayedGameScore score where score.playedGame.end >= ?0 and score.playedGame.end < ?1");
-		q.setParameter(0, from.getTime());
-		q.setParameter(1, to.getTime());
+				.createQuery("select distinct score.user from PlayedGameScore score where score.playedGame.end >= ?1 and score.playedGame.end < ?2");
+		q.setParameter(1, from.getTime());
+		q.setParameter(2, to.getTime());
 		return (long) q.getResultList().size();
 	}
 

@@ -112,11 +112,11 @@ public class OpenttdServerHandler {
 					game_league = Integer.parseInt(line.substring("game_league = ".length()));
 				}
 				if(line.startsWith("server_port = ")) {
-					Integer server_port = new Integer(line.substring("server_port = ".length()));
+					Integer server_port = Integer.parseInt(line.substring("server_port = ".length()));
 					configuration.clientPort = server_port;
 				}
 				if(line.startsWith("server_admin_port = ")) {
-					Integer server_admin_port = new Integer(line.substring("server_admin_port = ".length()));
+					Integer server_admin_port = Integer.parseInt(line.substring("server_admin_port = ".length()));
 					configuration.adminPort = server_admin_port;
 				}
 //				if(line.startsWith("rcon_password = ")) {
