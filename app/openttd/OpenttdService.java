@@ -24,8 +24,7 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 	@Override
 	public ExternalUser identifyUser(String loginToken) {
 		boolean readonly = true;
-		final String txName = "identifyUser";
-		JPA.startTx(txName, readonly);
+		JPA.startTx(JPA.DEFAULT, readonly);
 		try {
 			User user = User.findByUUID(loginToken);
 			if(user != null) {
@@ -37,13 +36,12 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 			}
 			return null;
 		} finally {
-			JPA.rollbackTx(txName);
+			JPA.rollbackTx(JPA.DEFAULT);
 		}
 	}
 
 	@Override
 	public void saveGame(Collection<GamePlayer> gamePlayers) {
-		final String txName = "saveGame";
 		OpenttdServerHandler server = OpenttdServerHandler.getInstance();
 		long scenarioId = server.getScenarioId();
 		Logger.info("saveGameStat(" + scenarioId + ", " + gamePlayers + ")");
@@ -52,7 +50,7 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 		//Logged user / companies
 		Map<GamePlayer, User> userByGamePlayer = new HashMap<GamePlayer, User>();
 
-		JPA.startTx(txName, false);
+		JPA.startTx(JPA.DEFAULT, false);
 		try {
 			//Filtrage des companies présentent loggées...
 			for(GamePlayer gamePlayer : gamePlayers) {
@@ -86,9 +84,9 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 				score.user = user;
 				score.create();
 			}
-			JPA.closeTx(txName);
+			JPA.closeTx(JPA.DEFAULT);
 		} catch(Exception e) {
-			JPA.rollbackTx(txName);
+			JPA.rollbackTx(JPA.DEFAULT);
 		}
 		Logger.info("saveGameStat() : Fin");
 	}

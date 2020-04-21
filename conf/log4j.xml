@@ -27,18 +27,17 @@
 		<priority value="info" />
 		<appender-ref ref="openttd.log"/>
 	</category>
-
+<!--
+	<category name="com.openttd.admin" additivity="false">
+		<priority value="debug" />
+		<appender-ref ref="openttd.log"/>
+	</category>
+	
 	<category name="com.openttd.robot" additivity="false">
 		<priority value="debug" />
 		<appender-ref ref="openttd.log"/>
 	</category>
-	
-	<category name="com.openttd.admin.model" additivity="false">
-		<priority value="debug" />
-		<appender-ref ref="openttd.log"/>
-	</category>
-	
-
+-->
 	<root>
 		<priority value="info"/>
 		<appender-ref ref="root.log"/>
