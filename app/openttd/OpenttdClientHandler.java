@@ -25,8 +25,8 @@ public class OpenttdClientHandler {
 	public synchronized void startup() {
 		OpenttdServerHandler server = OpenttdServerHandler.getInstance();
 		if(server.isRunning()) {
-			client = new OpenttdClient(server.getConfiguration());
-			client.startup();
+			 client = new OpenttdClient(server.getConfiguration());
+			 client.startup();
 		}
 	}
 	
