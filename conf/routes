@@ -28,15 +28,16 @@ POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/hide				forum.Topics.hid
 POST	/forums/{<[0-9]+>forumId}/topics/{<[0-9]+>topicId}/move/{<[0-9]+>toForumId}	forum.Topics.move
 
 # Registration/Authentication
-GET		/captcha		Application.captcha
-GET		/signup			forum.Users.signup
-POST	/signup			forum.Users.register
-GET		/signup/{uuid}		forum.Users.confirmRegistration
+GET		/captcha                Application.captcha
+GET		/signup                 forum.Users.signup
+POST	/signup                 forum.Users.register
+GET		/signup/{uuid}          forum.Users.confirmRegistration
 GET		/confirmation/{uuid}	forum.Users.resendConfirmation
+
 # Users
-GET		/users			forum.Users.index
-GET		/profile		forum.Users.profile
-POST	/profile		forum.Users.update
+GET		/users              forum.Users.index
+GET		/profile            forum.Users.profile
+POST	/profile            forum.Users.update
 GET		/forgottenPassword	forum.Users.forgottenPassword
 POST	/forgottenPassword	forum.Users.sendPassword
 GET		/forgottenEmail		forum.Users.forgottenEmail
@@ -52,9 +53,9 @@ GET		/scores/{period}	openttd.Scores.show
 GET		/scores/exportCSV	openttd.Scores.exportAsCSV
 
 # Leaderboard
-GET		/openttd			openttd.Openttd.index
-GET		/openttd/start		openttd.Openttd.start
-GET		/openttd/stop		openttd.Openttd.stop
+GET		/openttd                    openttd.Openttd.index
+GET		/openttd/start/{scenarioId}	openttd.Openttd.start
+GET		/openttd/stop/{scenarioId}	openttd.Openttd.stop
 
 # static files
 GET		/favicon.ico		staticFile:/public/images/favicon.ico

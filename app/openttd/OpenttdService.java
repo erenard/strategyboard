@@ -1,5 +1,6 @@
 package openttd;
 
+import com.openttd.network.admin.GameInfo;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -12,7 +13,6 @@ import models.leaderboard.Scenario;
 
 import play.Logger;
 import play.db.jpa.JPA;
-import play.db.jpa.JPAPlugin;
 
 import com.openttd.robot.ExternalServices.ExternalGameService;
 import com.openttd.robot.ExternalServices.ExternalUserService;
@@ -40,15 +40,16 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 		}
 	}
 
+    private final Map<Long, GameInfo> gameInfoByScenario = new HashMap<>();
+    private final Map<Long, Date> gameStartingDateByScenario = new HashMap<>();
+
 	@Override
-	public void saveGame(Collection<GamePlayer> gamePlayers) {
-		OpenttdServerHandler server = OpenttdServerHandler.getInstance();
-		long scenarioId = server.getScenarioId();
+	public void saveGame(long scenarioId, Collection<GamePlayer> gamePlayers) {
 		Logger.info("saveGameStat(" + scenarioId + ", " + gamePlayers + ")");
 
 		//Vérifications sur les loggins
 		//Logged user / companies
-		Map<GamePlayer, User> userByGamePlayer = new HashMap<GamePlayer, User>();
+		Map<GamePlayer, User> userByGamePlayer = new HashMap<>();
 
 		JPA.startTx(JPA.DEFAULT, false);
 		try {
@@ -66,10 +67,10 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 				} else Logger.info("Pas de CEO");
 			}
 
-		//Ecriture des stats générales de la partie
+            //Ecriture des stats générales de la partie
 			PlayedGame playedGame = new PlayedGame();
 			playedGame.scenario = Scenario.findById(scenarioId);
-			playedGame.begin = server.getStartingDate().getTime();
+			playedGame.begin = gameStartingDateByScenario.containsKey(scenarioId) ? gameStartingDateByScenario.get(scenarioId) : new Date();
 			playedGame.end = new Date();
 			playedGame.create();
 			
@@ -92,34 +93,41 @@ public class OpenttdService implements ExternalUserService, ExternalGameService 
 	}
 
 	@Override
-	public void endGame() {
+	public void endGame(long scenarioId) {
 		OpenttdAdminHandler admin = OpenttdAdminHandler.getInstance();
-		if(admin.isRunning()) {
-			admin.shutdown();
+		if(admin.isRunning(scenarioId)) {
+			admin.restart(scenarioId);
+			Logger.info("Admin restart");
+		}
+        
+        if(admin.isRunning(scenarioId)) {
+			admin.shutdown(scenarioId);
 			Logger.info("Admin shutted down");
 		}
-		OpenttdClientHandler client = OpenttdClientHandler.getInstance();
-		if(client.isRunning()) {
-			client.shutdown();
-			Logger.info("Client shutted down");
-		}
-		OpenttdServerHandler server = OpenttdServerHandler.getInstance();
-		if(server.isRunning()) {
-			server.shutdown();
-			Logger.info("Server shutted down");
-		}
-		if(!server.isRunning()) {
-			server.startup();
-			Logger.info("Server started up");
-		}
-		if(server.isRunning() && !admin.isRunning()) {
-			admin.startup();
+//		OpenttdClientHandler client = OpenttdClientHandler.getInstance();
+//		if(client.isRunning()) {
+//			client.shutdown();
+//			Logger.info("Client shutted down");
+//		}
+		if(!admin.isRunning(scenarioId)) {
+			admin.startup(scenarioId);
 			Logger.info("Admin started up");
 		}
-		if(server.isRunning() && !client.isRunning()) {
-			client.startup();
-			Logger.info("Client started up");
-		}
+//		if(!client.isRunning()) {
+//			client.startup();
+//			Logger.info("Client started up");
+//		}
+        gameStartingDateByScenario.put(scenarioId, new Date());
 	}
+    
 
+    @Override
+    public void exposeGame(long scenarioId, GameInfo gameState) {
+        gameInfoByScenario.put(scenarioId, gameState);
+    }
+
+    @Override
+    public GameInfo getGame(long scenarioId) {
+        return gameInfoByScenario.get(scenarioId);
+    }
 }

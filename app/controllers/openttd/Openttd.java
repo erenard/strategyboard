@@ -5,19 +5,15 @@ import java.util.List;
 import controllers.Application;
 import controllers.Check;
 import controllers.Profile;
-import groovy.lang.Closure;
-import java.io.PrintWriter;
-import java.util.Map;
 
 import openttd.OpenttdAdminHandler;
-import openttd.OpenttdServerHandler;
 
 import models.leaderboard.PlayedGame;
 import models.leaderboard.PlayedGameScore;
 import models.leaderboard.PlayerScore;
 import models.leaderboard.Scenario;
 import models.openttd.OpenttdServer;
-import openttd.OpenttdClientHandler;
+import models.openttd.RobotConfiguration;
 import play.cache.CacheFor;
 import play.mvc.With;
 
@@ -27,7 +23,12 @@ public class Openttd extends Application {
 	@CacheFor("5s")
 	@Check(value = {Profile.VIEWER})
 	public static void index() {
-		OpenttdServer openTTDStatus = OpenttdServer.getStatus();
+		OpenttdServer articStatus = OpenttdServer.getStatus(RobotConfiguration.ARTIC);
+        OpenttdServer deserticStatus = OpenttdServer.getStatus(RobotConfiguration.DESERTIC);
+		OpenttdServer highSpeedStatus = OpenttdServer.getStatus(RobotConfiguration.HIGH_SPEED);
+		OpenttdServer steamStatus = OpenttdServer.getStatus(RobotConfiguration.STEAM);
+		OpenttdServer toylandStatus = OpenttdServer.getStatus(RobotConfiguration.TOYLAND);
+
 		List<PlayerScore> playerScores = PlayedGameScore.getLastMonthPlayerScores(1, 10);
 		List<PlayedGame> lastPlayedGames = PlayedGame.getLastPlayedGames();
 		List<PlayedGame> bestArticGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.Artic);
@@ -36,8 +37,12 @@ public class Openttd extends Application {
 		List<PlayedGame> bestSteamGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.Steam);
 		List<PlayedGame> bestToylandGames = PlayedGame.getBestPlayedGamesForScenarioId(Scenario.Id.Toyland);
 		render(
-				openTTDStatus,
-				playerScores,
+				articStatus,
+                deserticStatus,
+                highSpeedStatus,
+                steamStatus,
+                toylandStatus,
+                playerScores,
 				lastPlayedGames,
 				bestArticGames,
 				bestDeserticGames,
@@ -48,37 +53,20 @@ public class Openttd extends Application {
 	}
 	
 	@Check(value = {Profile.MODERATOR})
-	public static void start() {
-		OpenttdServerHandler serverHandler = OpenttdServerHandler.getInstance();
-		if(!serverHandler.isRunning()) {
-			serverHandler.startup();
-		}
+	public static void start(Long scenarioId) {
 		OpenttdAdminHandler adminHandler = OpenttdAdminHandler.getInstance();
-		if(serverHandler.isRunning() && !adminHandler.isRunning()) {
-			adminHandler.startup();
-		}
-		OpenttdClientHandler clientHandler = OpenttdClientHandler.getInstance();
-		if(serverHandler.isRunning() && !clientHandler.isRunning()) {
-			clientHandler.startup();
+		if(!adminHandler.isRunning(scenarioId)) {
+			adminHandler.startup(scenarioId);
 		}
 		index();
 	}
 
 	@Check(value = {Profile.MODERATOR})
-	public static void stop() {
-		OpenttdServerHandler serverHandler = OpenttdServerHandler.getInstance();
-		if(serverHandler.isRunning()) {
-			serverHandler.shutdown();
-		}
+	public static void stop(Long scenarioId) {
 		OpenttdAdminHandler adminHandler = OpenttdAdminHandler.getInstance();
-		if(adminHandler.isRunning()) {
-			adminHandler.shutdown();
-		}
-		OpenttdClientHandler clientHandler = OpenttdClientHandler.getInstance();
-		if(clientHandler.isRunning()) {
-			clientHandler.shutdown();
+		if(adminHandler.isRunning(scenarioId)) {
+			adminHandler.shutdown(scenarioId);
 		}
 		index();
 	}
-
 }

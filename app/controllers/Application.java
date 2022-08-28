@@ -6,7 +6,6 @@ import models.forum.Topic;
 import models.forum.User;
 import models.leaderboard.PlayedGameScore;
 import models.leaderboard.PlayerScore;
-import models.openttd.OpenttdServer;
 import play.Play;
 import play.cache.Cache;
 import play.cache.CacheFor;
@@ -32,15 +31,10 @@ public class Application extends Controller {
 	@CacheFor("5s")
 	public static void index(Integer page) {
 		List<PlayerScore> playerScores = PlayedGameScore.getLastMonthPlayerScores(1, 10);
-		
-		OpenttdServer openTTDStatus = OpenttdServer.getStatus();
-		
 		Forum forum = Forum.find("name", "Home Page").first();
-
 		List<Topic> news = forum.getTopics(page != null ? page : 1, pageSize);
 		int newsCount = news.size();
-		
-		render(playerScores, openTTDStatus, news, newsCount);
+		render(playerScores, news, newsCount);
 	}
 
 	public static void captcha(String id) {

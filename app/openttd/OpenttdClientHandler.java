@@ -1,6 +1,7 @@
 package openttd;
 
 import com.openttd.client.OpenttdClient;
+import com.openttd.network.core.Configuration;
 
 /**
  * Cette classe gère le cycle de vie du client openttd
@@ -22,12 +23,11 @@ public class OpenttdClientHandler {
 		return client != null && client.isConnected();
 	}
 	
-	public synchronized void startup() {
-		OpenttdServerHandler server = OpenttdServerHandler.getInstance();
-		if(server.isRunning()) {
-			 client = new OpenttdClient(server.getConfiguration());
-			 client.startup();
-		}
+	public synchronized void startup(int port) {
+        Configuration conf = new Configuration();
+        conf.clientPort = port;
+        client = new OpenttdClient(conf);
+        client.startup();
 	}
 	
 	public synchronized void shutdown() {
