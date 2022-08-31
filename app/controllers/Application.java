@@ -8,7 +8,6 @@ import models.leaderboard.PlayedGameScore;
 import models.leaderboard.PlayerScore;
 import play.Play;
 import play.cache.Cache;
-import play.cache.CacheFor;
 import play.libs.Images;
 import play.mvc.Before;
 import play.mvc.Controller;
@@ -28,7 +27,6 @@ public class Application extends Controller {
 
 	// ~~~~~~~~~~~~ Actions
 
-	@CacheFor("5s")
 	public static void index(Integer page) {
 		List<PlayerScore> playerScores = PlayedGameScore.getLastMonthPlayerScores(1, 10);
 		Forum forum = Forum.find("name", "Home Page").first();

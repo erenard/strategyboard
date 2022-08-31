@@ -9,7 +9,6 @@ import controllers.Profile;
 
 import models.leaderboard.PlayedGameScore;
 import models.leaderboard.PlayerScore;
-import play.cache.CacheFor;
 import play.mvc.With;
 import tasks.ExportScoresCsvGenerator;
 
@@ -24,7 +23,6 @@ public class Scores extends Application {
 		show(period_last_month, 1);
 	}
 	
-	@CacheFor("5s")
 	@Check(value = {Profile.VIEWER})
 	public static void show(String period, Integer page) {
 		long nbScores = 0;

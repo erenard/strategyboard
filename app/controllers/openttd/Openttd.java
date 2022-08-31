@@ -14,13 +14,11 @@ import models.leaderboard.PlayerScore;
 import models.leaderboard.Scenario;
 import models.openttd.OpenttdServer;
 import models.openttd.RobotConfiguration;
-import play.cache.CacheFor;
 import play.mvc.With;
 
 @With(Profile.class)
 public class Openttd extends Application {
 	
-	@CacheFor("5s")
 	@Check(value = {Profile.VIEWER})
 	public static void index() {
 		OpenttdServer articStatus = OpenttdServer.getStatus(RobotConfiguration.ARTIC);

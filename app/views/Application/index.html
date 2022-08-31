@@ -2,18 +2,20 @@
 #{set title:'News' /}
 <div class="row">
 	<div class="col-xs-12 col-sm-4 col-md-3">
+		<!--
 		#{miniOpenTTDStatus articStatus /}
 		#{miniOpenTTDStatus deserticStatus /}
 		#{miniOpenTTDStatus highSpeedStatus /}
 		#{miniOpenTTDStatus steamStatus /}
 		#{miniOpenTTDStatus toylandStatus /}
+		-->
 		#{if connectedUser} #{ingameLogin connectedUser /} #{/if}
 		#{miniLeaderBoard playerScores /}
-	</div><!--/span-->
+	</div>
 	<div class="col-xs-12 col-sm-8 col-md-9">
 		#{list items:news, as:'topic'}
 		#{showNews topic.firstPost /}
 		#{/list}
-	</div><!--/span-->
-</div><!--/row-->
+	</div>
+</div>
 #{pagination page:page ?: 1, size:10 /}
