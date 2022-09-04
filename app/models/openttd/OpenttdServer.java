@@ -45,7 +45,7 @@ public class OpenttdServer {
         this.name = gameInfo.getServerName();
         this.revision = gameInfo.getServerRevision();
 		this.goal = "Reach the best company performance in 10 years to win the game.";
-        this.startedDate = sdf.format(gameInfo.getStartDate());
+        this.startedDate = sdf.format(Convert.dayToCalendar(gameInfo.getStartDate()).getTime());
 		if(scenario != null) this.image = scenario.getImage();
 
 		this.width = gameInfo.getMapWidth();
