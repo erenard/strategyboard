@@ -10,11 +10,11 @@
 #{list items:_arg, as:'playedGame'}
 	<tr>
 		<td>
-		#{if playedGame.winner}<a href="@{forum.Users.show(playedGame.winner.player.id)}">${playedGame.winner.player.name}</a>#{/if}
+		#{if playedGame[0].winner}<a href="@{forum.Users.show(playedGame[0].winner.player.id)}">${playedGame[0].winner.player.name}</a>#{/if}
 		#{else}Anonymous#{/else}
 		</td>
-		<td>#{if playedGame.winner}${playedGame.winner.points}#{/if}</td>
-		<td>${playedGame.end.since()}</td>
+		<td>#{if playedGame[0].winner}${(int) playedGame[1]}#{/if}</td>
+		<td>${playedGame[0].end.since()}</td>
 	</tr>
 #{/list}
 </tbody>
