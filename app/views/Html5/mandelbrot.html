@@ -2,12 +2,9 @@
 #{set title: 'Mandelbrot fractal' /}
 #{set subtitle: 'Rendered with WebGL shaders' /}
 <style type="text/css">
-#mandelbrot { width: 100%; height: calc(100VH - 320px); border: none; }
+.container-fullscreen { flex: 1; padding-bottom: 15px; display: flex; }
+#mandelbrot { width: 100%; flex: 1; border: none; }
 </style>
-<ol class="breadcrumb">
-	<li><a href="@{Html5.index}">HTML5</a></li>
-	<li class="active">#{get 'title'/}</li>
-</ol>
-<div class="container-fluid">
+<div class="container-fullscreen">
     <iframe id="mandelbrot" src="https://erenard.github.io/mandelbrot"></iframe>
 </div>
