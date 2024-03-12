@@ -2,89 +2,12 @@
 #{set title: "Conway's game of life" /}
 #{set subtitle: "Rendered with HTML5 canvas" /}
 <style type="text/css">
-    @font-face {
-        font-family: subway-ticker;
-        src: url(/public/html5/life/subway-ticker.ttf);
-    }
-    @font-face {
-        font-family: pixel-8bit;
-        /* Font author: http://www.04.jp.org/ */
-        src: url(/public/html5/life/04B_03__.TTF);
-    }
-    .box {
-        font-family: pixel-8bit;
-        font-size: 16px;
-        background-color: black;
-        display: inline-block;
-        color: rgb(0, 127, 0);
-        vertical-align: top;
-    }
-    .box h1 {
-        font-family: subway-ticker;
-        font-weight: normal;
-        color: rgb(127, 255, 127);
-        font-size: 32px;
-    }
-    .box div {
-        vertical-align: baseline;
-        margin-bottom: 10px;
-    }
-    .box a {
-        color: rgb(127, 255, 127);
-    }
-    .box button, .box select, .box input {
-        font-family: pixel-8bit;
-        font-size: 16px;
-        background-color: black;
-        color: rgb(127, 255, 127);
-    }
+#lifeJs { width: 100%; height: calc(100VH - 320px); border: none; }
 </style>
 <ol class="breadcrumb">
     <li><a href="@{Html5.index}">HTML5</a></li>
     <li class="active">#{get 'title'/}</li>
 </ol>
-<div class="container">
-    <canvas id="viewport" width="640" height="480" class="box"></canvas>
-    <div class="box">
-        <div>
-            <h1>Controls</h1>
-            <button id="start" style="display: none;">Resume</button><button id="stop">Pause</button> the game.<br/>
-            <button id="clear">Clear</button> the board.<br/>
-            <button id="random">Random</button> fill ratio: <input type="text" id="ratio" style="width: 1.5em;" value="30" />%<br/>
-        </div>
-        <div>
-            <br/><h1>Rules</h1>
-            <div style="display: inline-block;">
-                Birth rules<br/>
-                <input id="b0" type="checkbox" />0<input id="b1" type="checkbox" />1<input id="b2" type="checkbox" />2<br/>
-                <input id="b3" type="checkbox" />3<input id="b4" type="checkbox" />4<input id="b5" type="checkbox" />5<br/>
-                <input id="b6" type="checkbox" />6<input id="b7" type="checkbox" />7<input id="b8" type="checkbox" />8<br/>
-            </div>
-            <div style="display: inline-block; margin-left: 10px;">
-                Survival rules<br/>
-                <input id="s0" type="checkbox" />0<input id="s1" type="checkbox" />1<input id="s2" type="checkbox" />2<br/>
-                <input id="s3" type="checkbox" />3<input id="s4" type="checkbox" />4<input id="s5" type="checkbox" />5<br/>
-                <input id="s6" type="checkbox" />6<input id="s7" type="checkbox" />7<input id="s8" type="checkbox" />8<br/>
-            </div>
-            <br/>Load a preset: <select id="presets">
-                <option value="b3s23">Conway</option>
-                <option value="b36s23">HighLife</option>
-                <option value="b1357s1357">Replicator</option>
-                <option value="b2s">Seeds</option>
-                <option value="b25s2">Self-replic.</option>
-                <option value="b3s012345678">No death</option>
-                <option value="b34s34">34 Life</option>
-                <option value="b35678s5678">Diamoeba</option>
-                <option value="b36s125">2x2</option>
-                <option value="b3678s34678">Day&Night</option>
-                <option value="b368s245">Morley</option>
-                <option value="b4567s5678">Islands</option>
-                <option value="b4567s4567">Blobs</option>
-                <option value="custom">Custom</option>
-            </select>
-            <br/>More info on presets <a href="http://en.wikipedia.org/wiki/Life-like_cellular_automaton" target="_blank">here</a><br/>
-        </div>
-        <br/><span id="fps">55</span>&nbsp;fps
-    </div>
-    <script type="text/javascript" src="/public/html5/life/life.js"></script>
+<div class="container-fluid">
+    <iframe id="lifeJs" src="https://erenard.github.io/life.js"></iframe>
 </div>
