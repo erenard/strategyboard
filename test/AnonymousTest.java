@@ -2,7 +2,7 @@ import org.junit.*;
 import play.test.*;
 import play.mvc.Http.*;
 
-public class AnonymousTest extends FunctionalTest {
+public class AnonymousTest extends BaseFunctionalTest {
 
 	@Test
 	public void canAccessToHomePage() {

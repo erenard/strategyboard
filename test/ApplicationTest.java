@@ -2,7 +2,7 @@ import org.junit.*;
 import play.test.*;
 import play.mvc.Http.*;
 
-public class ApplicationTest extends FunctionalTest {
+public class ApplicationTest extends BaseFunctionalTest {
 
 	@Test
 	public void testThatIndexPageWorks() {

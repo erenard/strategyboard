@@ -1,11 +1,11 @@
 *{ You can use plain selenium command using the selenium tag }*
 
-#{fixture delete: models.forum.Category.class /}
-#{fixture delete: models.forum.Forum.class /}
-#{fixture delete: models.forum.Topic.class /}
-#{fixture delete: models.forum.Post.class /}
-#{fixture delete: models.forum.UserGroup.class /}
-#{fixture delete: models.forum.User.class /}
+#{fixture delete: 'all' /}
+
+
+
+
+
 #{fixture load: 'data.yml' /}
 
 #{selenium 'Security check'}
@@ -27,6 +27,6 @@
     open('/admin')
     assertNotTitle('Application error')
     assertTextNotPresent('Not Found')
-    assertTextPresent('Forbidden')
+    assertTextPresent('Please enter you email address and password.')
     
 #{/selenium}
