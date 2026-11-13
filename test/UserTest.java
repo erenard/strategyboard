@@ -1,24 +1,13 @@
-import models.forum.User;
-
-import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 
 import play.mvc.Http.Response;
-import play.mvc.Scope.Session;
-import play.test.FunctionalTest;
 
-public class UserTest extends FunctionalTest {
+public class UserTest extends BaseFunctionalTest {
 	
 	@Before
-	public void login() {
-		Session.current().put("username", "bob@domain.com");
-		Session.current().put("user", User.findByEmail("bob@domain.com"));
-	}
-
-	@After
-	public void logout() {
-		Session.current().remove("username", "user");
+	public void signInAsUser() {
+		login("bob@domain.com", "secret");
 	}
 
 	@Test

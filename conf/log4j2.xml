@@ -5,6 +5,10 @@
     <Properties>
         <!-- This line alone blocks 90% of Log4Shell attempts -->
         <Property name="LOG_PATTERN">%d{yyyy-MM-dd HH:mm:ss} %-5level %logger{36} - %replace{%msg}{[\r\n]+}{ }%n</Property>
+        <!-- Logs live in <project root>/logs (already git-ignored). ${sys:user.dir} is the JVM
+             working directory, which is the application directory when play is started from it
+             (play run / play auto-test / play check are all invoked in strategyboard/). -->
+        <Property name="LOG_DIR">${sys:user.dir}/logs</Property>
     </Properties>
 
     <Appenders>
@@ -15,8 +19,8 @@
 
         <!-- File appender with additional security measures -->
         <RollingFile name="OpenttdAppender"
-                fileName="/home/eric/play/logs/openttd.log"
-                filePattern="/home/eric/play/logs/openttd-%d{yyyy-MM-dd}.log">
+                fileName="${LOG_DIR}/openttd.log"
+                filePattern="${LOG_DIR}/openttd-%d{yyyy-MM-dd}.log">
             <PatternLayout pattern="${LOG_PATTERN}" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
@@ -25,8 +29,8 @@
 
         <!-- File appender with additional security measures -->
         <RollingFile name="FileAppender"
-                fileName="/home/eric/play/logs/application.log"
-                filePattern="/home/eric/play/logs/application-%d{yyyy-MM-dd}.log">
+                fileName="${LOG_DIR}/application.log"
+                filePattern="${LOG_DIR}/application-%d{yyyy-MM-dd}.log">
             <PatternLayout pattern="${LOG_PATTERN}" />
             <Policies>
                 <TimeBasedTriggeringPolicy />
@@ -41,6 +45,29 @@
 
     <Loggers>
         <Logger level="INFO" name="play">
+            <AppenderRef ref="FileAppender" />
+        </Logger>
+        <!-- Application-level logging. play.Logger logs under the logger named "play" unless the
+             application sets application.log.recordCaller=true (play.Play reads it), which names
+             the log4j2 logger after the *calling* class: controllers.Application,
+             controllers.forum.Users, models.openttd.OpenttdServer ... Without an entry those
+             inherit Root and are dropped to /dev/null. log4j2 matches by dotted prefix, so one
+             entry per application package root covers the whole app. -->
+        <Logger level="INFO" name="controllers">
+            <AppenderRef ref="FileAppender" />
+        </Logger>
+        <Logger level="INFO" name="models">
+            <AppenderRef ref="FileAppender" />
+        </Logger>
+        <Logger level="INFO" name="notifiers">
+            <AppenderRef ref="FileAppender" />
+        </Logger>
+        <Logger level="INFO" name="tasks">
+            <AppenderRef ref="FileAppender" />
+        </Logger>
+        <!-- app/openttd (OpenttdService): game stats + admin/client start-stop logging. Kept on
+             FileAppender; the com.openttd bot packages have their own OpenttdAppender below. -->
+        <Logger level="INFO" name="openttd">
             <AppenderRef ref="FileAppender" />
         </Logger>
         <Logger level="DEBUG" name="com.openttd">

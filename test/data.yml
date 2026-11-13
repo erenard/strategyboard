@@ -1,122 +1,216 @@
 # Test data
+#
+# Entity ids are assigned in the order the entries appear below, and the tests
+# address entities by id (e.g. /forums/1, /forums/1/topics/1). Keep the ordering.
+#
+# mainCategory must be the SECOND Category: Profile.Security.check() falls back to
+# Category.findById(2) when the route has no forumId (see the TODO in that method).
 
-Category(mainCategory):
-  name: Main Category
-  description: Main Category
-
-Category(moderatorsCategory):
-  name: Moderators Category
-  description: Moderators Category
-
-UserGroup(admin):
+models.forum.UserGroup(admin):
   name:        Admin
   description: Admin
   admin:       true
 
-UserGroup(moderators):
+models.forum.UserGroup(moderators):
   name:        Moderators
   description: Moderators
   admin:       false
 
-UserGroup(users):
+models.forum.UserGroup(users):
   name:        General
   description: General
   admin:       false
 
-UserGroup(anonymous):
+models.forum.UserGroup(anonymous):
   name:        Anonymous
   description: Anonymous
   admin:       false
 
-Permission(postMain):
+models.forum.Category(moderatorsCategory):
+  name:        Moderators Category
+  description: Moderators Category
+
+models.forum.Category(mainCategory):
+  name:        Main Category
+  description: Main Category
+
+models.forum.Permission(postMain):
   category:    "mainCategory"
   group:       "users"
   accessLevel: 3
 
-Permission(moderateMain):
+models.forum.Permission(moderateMain):
   category:    "mainCategory"
   group:       "moderators"
   accessLevel: 4
 
-Permission(postModerators):
-  category:   "moderatorsCategory"
-  group:      "moderators"
+models.forum.Permission(postModerators):
+  category:    "moderatorsCategory"
+  group:       "moderators"
   accessLevel: 3
 
-Permission(viewAnonymous):
+models.forum.Permission(viewModerators):
+  category:    "moderatorsCategory"
+  group:       "users"
+  accessLevel: 1
+
+models.forum.Permission(viewAnonymous):
   category:    "mainCategory"
   group:       "anonymous"
   accessLevel: 1
 
 # passwords : secret
+# confirmed defaults to false, so logged-in accounts must opt in explicitly.
 
-User(admin):
-    email:        admin@domain.com
-    passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
-    name:         Admin
-    group:        "admin"
+models.forum.User(admin):
+  email:        admin@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Admin
+  group:        "admin"
+  active:       true
+  confirmed:    true
 
-User(modo):
-    email:        modo@domain.com
-    passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
-    name:         Moderator
-    group:        "moderators"
+models.forum.User(modo):
+  email:        modo@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Moderator
+  group:        "moderators"
+  active:       true
+  confirmed:    true
 
-User(bob):
-    email:        bob@domain.com
-    passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
-    name:         Bob
-    group:        "users"
+models.forum.User(bob):
+  email:        bob@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Bob
+  group:        "users"
+  active:       true
+  confirmed:    true
 
-User(anonymous):
-    email:        anonymous@domain.com
-    passwordHash: 
-    name:         Anonymous
-    group:        "anonymous"
+# Must match anonymous.email in conf/application.conf: Profile.checkAccess() puts this
+# email in the session and Profile.Security.check() looks the user up by email.
+models.forum.User(anonymous):
+  email:        anonymous@domain.com
+  passwordHash:
+  name:         Anonymous
+  group:        "anonymous"
+  active:       true
+  confirmed:    false
 
-Forum(mainForum1):
-  name:        mainForum1
-  description: Main forum 1 description
-  category:    "mainCategory"
-  locked:      false
-  topics:      [t1, t2, t3]
+# Forums: ids 1..5 in this order
+#   1 mainForum1   2 mainForum2   3 modoForum1   4 modoForum2   5 homePage
 
-Topic(t1):
+models.forum.Forum(mainForum1):
+  name:         mainForum1
+  description:  Main forum 1 description
+  category:     "mainCategory"
+  displayOrder: 1
+  locked:       false
+
+models.forum.Forum(mainForum2):
+  name:         mainForum2
+  description:  Main forum 2 description
+  category:     "mainCategory"
+  displayOrder: 2
+  locked:       false
+
+models.forum.Forum(modoForum1):
+  name:         modoForum1
+  description:  Moderators forum 1 description
+  category:     "moderatorsCategory"
+  displayOrder: 3
+  locked:       false
+
+models.forum.Forum(modoForum2):
+  name:         modoForum2
+  description:  Moderators forum 2 description
+  category:     "moderatorsCategory"
+  displayOrder: 4
+  locked:       false
+
+models.forum.Forum(homePage):
+  name:         Home Page
+  description:  News, shown on the home page
+  category:     "mainCategory"
+  displayOrder: 5
+  locked:       false
+
+# Topics: ids 1..5 in this order (t1=1, t2=2, t3=3 are used by the functional tests)
+
+models.forum.Topic(t1):
   subject: Topic Normal
   views:   0
   forum:   "mainForum1"
   locked:  false
   hidden:  false
 
-Topic(t2):
+models.forum.Topic(t2):
   subject: Topic Locked
   views:   0
   forum:   "mainForum1"
   locked:  true
   hidden:  false
 
-Topic(t3):
+models.forum.Topic(t3):
   subject: Topic Hidden
   views:   0
   forum:   "mainForum1"
   locked:  false
   hidden:  true
 
-Forum(mainForum2):
-  name:        mainForum2
-  description: Main forum 2 description
-  category:    "mainCategory"
-  locked:      false
+models.forum.Topic(news1):
+  subject: First news
+  views:   0
+  forum:   "homePage"
+  locked:  false
+  hidden:  false
 
-Forum(modoForum1):
-  name:        modoForum1
-  description: Moderators forum 1 description
-  category:    "moderatorsCategory"
-  locked:      false
+models.forum.Topic(news2):
+  subject: Second news
+  views:   0
+  forum:   "homePage"
+  locked:  false
+  hidden:  false
 
-Forum(modoForum2):
-  name:        modoForum2
-  description: Moderators forum 2 description
-  category:    "moderatorsCategory"
-  locked:      false
+# Posts: Forum.getTopics() / Topic.getPosts() join on Post, so every topic needs one.
 
+models.forum.Post(p1):
+  subject:   Topic Normal
+  content:   First post of the normal topic.
+  postedAt:  2024-01-01
+  postedBy:  "bob"
+  topic:     "t1"
+
+models.forum.Post(p2):
+  subject:   Topic Normal reply
+  content:   Second post of the normal topic.
+  postedAt:  2024-01-02
+  postedBy:  "modo"
+  topic:     "t1"
+
+models.forum.Post(p3):
+  subject:   Topic Locked
+  content:   First post of the locked topic.
+  postedAt:  2024-01-03
+  postedBy:  "modo"
+  topic:     "t2"
+
+models.forum.Post(p4):
+  subject:   Topic Hidden
+  content:   First post of the hidden topic.
+  postedAt:  2024-01-04
+  postedBy:  "modo"
+  topic:     "t3"
+
+models.forum.Post(p5):
+  subject:   First news
+  content:   Body of the first news post.
+  postedAt:  2024-01-05
+  postedBy:  "admin"
+  topic:     "news1"
+
+models.forum.Post(p6):
+  subject:   Second news
+  content:   Body of the second news post.
+  postedAt:  2024-01-06
+  postedBy:  "admin"
+  topic:     "news2"

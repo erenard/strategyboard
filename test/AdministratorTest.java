@@ -2,22 +2,13 @@ import org.junit.*;
 import org.junit.After;
 import org.junit.Before;
 
-import play.test.*;
 import play.mvc.Http.*;
-import play.mvc.Scope.Session;
-import models.forum.User;
 
-public class AdministratorTest extends FunctionalTest {
+public class AdministratorTest extends BaseFunctionalTest {
 	
 	@Before
-	public void login() {
-		Session.current().put("username", "admin@domain.com");
-		Session.current().put("user", User.findByEmail("admin@domain.com"));
-	}
-
-	@After
-	public void logout() {
-		Session.current().remove("username", "user");
+	public void signInAsAdmin() {
+		login("admin@domain.com", "secret");
 	}
 
 	@Test
@@ -62,8 +53,10 @@ public class AdministratorTest extends FunctionalTest {
 
 	@Test
 	public void cannotAccessToAHiddenTopic() {
+		// forum.Topics.show() forbids hidden topics for everybody, admins included
+		// (a moderator unhides it first).
 		Response response = GET("/forums/1/topics/3");
-		assertIsOk(response);
+		assertEquals(403, response.status.intValue());
 		assertContentType("text/html", response);
 		assertCharset(play.Play.defaultWebEncoding, response);
 	}
