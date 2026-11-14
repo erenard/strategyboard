@@ -31,11 +31,58 @@ Always from `strategyboard/` in a shell that sourced `tools/env.sh`. The ladder 
 ## Tests
 
 - Unit tests extend `play.test.UnitTest` (Play's JUnit wrapper), e.g. `test/UserTest.java`; functional/page tests extend `BaseFunctionalTest` (`play.test.FunctionalTest`), e.g. `test/TopicsPageTest.java`. `test/controllers/Categories.java` is a test-only controller stand-in: test sources compile into the same class loader, so its actions become reversible through the catch-all routes — the application itself has no `Categories` controller.
+- Shared setup, and the suites that use it: `BaseFunctionalTest` (fixtures, `login()`) → `BaseForumViewTest` (whitespace-collapsed markup, flash, template helpers) → `BaseCrudTest` (the CRUD module's markup); `BaseModelTest` (typed row lookups, printers, `failure`/`causeChain`) → `BaseOpenttdTest` (reflective access to the handler singletons plus the fake robot/sender/client). The bases are abstract, so the testrunner never runs them: 60 `*Test.java` files in `test/`, 55 suites in `test-result/`.
 - `test/*.test.html` are Selenium suites using Play template fixture tags (`#{fixture delete: ... /}` `#{fixture load: 'data.yml' /}`) — they need a working DB and a running test server, not plain JUnit.
-- Test data lives in `test/data.yml`; initial production data in `conf/initial-data.yml`. Several page tests load extra fixtures from `test/`: `Fixtures.loadModels("index-data.yml")`, `"scores-data.yml"`, `"openttd-data.yml"`.
+- Test data lives in `test/data.yml`; initial production data in `conf/initial-data.yml`. Several page tests load extra fixtures from `test/`: `Fixtures.loadModels("index-data.yml")`, `"scores-data.yml"`, `"openttd-data.yml"`, `"attachments-data.yml"`. **Never edit `test/data.yml` to make a test pass** — a new fixture goes in a new `test/*.yml` loaded by that suite. Like the other files in `test/`, a fixture file is rendered as a Play template before being parsed as YAML, so it must contain no play tag or `$` expression.
+- `BaseFunctionalTest.loadFixtures()` runs `Fixtures.deleteDatabase()` + `Fixtures.loadModels("data.yml")` in a transaction of its own before **every** method, so fixture ids restart at 1 per test: `Admin` is always id 1, `Bob` id 3, `test/openttd-data.yml` scenarios always take ids 1..5. Assertions may pin those ids.
 - **Test mode** (the official Play 1.x flow — the docs stop at 1.5.x): `play test` sets the framework id `test`, so `%test.*` keys in `application.conf` apply (`%test.db`, `%test.jpa.ddl=create`, `%test.mail.smtp=mock`, `%test.application.mode=dev`, `%test.jpda.port=8002`, `%test.forum.attachments.path`), `test/` is added to `Play.javaPath` only in test mode, and Play auto-loads the framework's `testrunner` module as `_testrunner`. That module has **no `conf/routes`**: the runner routes come from `TestRunnerPlugin.onRoutesLoaded()` — `/@tests`, `/@tests.list`, `GET|POST /@tests/{<.*>test}`, `/@tests/emails`, `/@tests/cache`. They are prepended, so they win over the app's catch-all route.
-- **`play auto-test`** = test server + `play.modules.testrunner.FirePhoque` (htmlunit, classpath `modules/testrunner/conf` + `lib/play-testrunner.jar` + `firephoque/*.jar`): `GET /@tests.list` → `GET /@tests/init` (clears `test-result/`) → each `GET /@tests/<test>.class` (selenium suites go through `/public/test-runner/selenium/TestRunner.html`) → `GET /@tests/end?result=passed|failed`, which writes **`test-result/result.passed` or `result.failed`** — that marker is the pass/fail signal, plus one `<test>.passed.html` and `TEST-<test>.xml` per suite and `test-result/application.log`. Flags: `--unit`, `--functional`, `--selenium`, `--timeout=N`; knobs `%test.webclient.timeout` and `%test.headlessBrowser` (the suite currently runs in ~15 s, so neither is needed). FirePhoque prints its per-suite `PASSED/FAILED` lines to the CLI, not to `logs/`.
+- **`play auto-test`** = test server + `play.modules.testrunner.FirePhoque` (htmlunit, classpath `modules/testrunner/conf` + `lib/play-testrunner.jar` + `firephoque/*.jar`): `GET /@tests.list` → `GET /@tests/init` (clears `test-result/`) → each `GET /@tests/<test>.class` (selenium suites go through `/public/test-runner/selenium/TestRunner.html`) → `GET /@tests/end?result=passed|failed`, which writes **`test-result/result.passed` or `result.failed`** — that marker is the pass/fail signal, plus one `<test>.passed.html` and `TEST-<test>.xml` per suite and `test-result/application.log`. Flags: `--unit`, `--functional`, `--selenium`, `--timeout=N`; knobs `%test.webclient.timeout` and `%test.headlessBrowser`. FirePhoque prints its per-suite `PASSED/FAILED` lines to the CLI, not to `logs/`, and **always exits 0**: the wrapper only checks the marker, so `play auto-test` exits 1 when `result.failed` exists (and prints `~ Some tests have failed`) and 0 with `~ All tests passed` when `result.passed` exists.
+- The suite is 55 Java suites (632 tests) + 2 selenium suites (`Application.test.html`, `Forum.test.html`) and takes ~52 s wall clock, so `--timeout` and `%test.headlessBrowser` are not needed. Only the Java suites get a `TEST-<suite>.xml` (55); the selenium suites get `<test>.passed.html`, so 57 markers vs 55 XML files is normal. See `TEST_COVERAGE.md` for what each suite covers, the defects pinned in application code and the branches left uncovered on purpose.
 - `play auto-test` is destructive: it deletes `tmp/` and `test-result/` at start, and `%test.jpa.ddl=create` drops and recreates the whole `www` schema every run.
+
+### Test sources are compiled by Eclipse JDT, not javac
+
+`play check` never compiles `test/` (test sources join `Play.javaPath` only in test mode), and Play's
+`ApplicationCompiler` uses `org.eclipse.jdt.core` at compliance `java.source` — default `"11"`
+(`ApplicationCompiler.JAVA_SOURCE_DEFAULT_VERSION`). JDT is stricter than javac about generic inference:
+`GenericModel.findById()` and `findAll()` are declared `<T extends JPABase> T`, so JDT infers `JPABase` even
+inside a lambda and rejects `for (PlayedGameScore score : PlayedGameScore.findAll())`
+(`Type mismatch: cannot convert from element type JPABase to PlayedGameScore`) and a field access on
+`PlayedGame.findById(1L)` (`begin cannot be resolved or is not a field`). Declare a typed local first
+(`List<PlayedGameScore> scores = PlayedGameScore.findAll()`) or cast
+(`(PlayedGame) PlayedGame.findById(id)`); javac passing is not proof. One uncompilable test file makes
+`GET /@tests.list` answer 500 and takes the whole runner down — the reason appears in
+`test-result/application.log` as `Compilation error (In /test/... around line N)`.
+
+To check test sources before launching a server, run the same compiler at the same compliance level
+(JDT batch `Main` rejects `dir/*` classpath entries, so the jars must be listed, and needs `-proc:none`):
+`bash /tmp/opencode/check-tests.sh` (outside this repo).
+
+### JPA and singletons inside tests
+
+- **Never nest `JPA.withTransaction`.** The inner call re-binds and closes the outer EntityManager and
+  unbinds the thread, so rows written by the outer block are lost. The fixture load in `BaseFunctionalTest`
+  already nests inside the testrunner Job's transaction, which orphans that EntityManager and leaks one Hikari
+  connection per suite — `%test.db.pool.maxSize` is raised in `conf/application.conf` for that.
+- `OpenttdService.identifyUser()`, `saveGame()` and `endGame()` open transactions of their own
+  (`JPA.startTx` / `closeTx` / `rollbackTx`), so call them **outside** an ambient transaction and read the rows
+  they wrote back in a transaction of their own. An entity handed back by a closed transaction is detached and
+  its lazy collection raises `org.hibernate.LazyInitializationException`.
+- MariaDB keeps `DATETIME` to the second, so a date built in Java reads back as `java.sql.Timestamp` with its
+  millis rounded down: compare millis or relative order, never the string form, and never pin two clock
+  stamps that land in different seconds.
+- `app/openttd/OpenttdAdminHandler` and `OpenttdClientHandler` are singletons holding a `robots` map and a
+  `client` field, and `ExternalServices.getInstance()` holds the `OpenttdService` the handler wired. Suites
+  inject fakes through reflection and must remove them in a `finally`: `OpenttdPageTest` asserts every scenario
+  answers `isRunning == false`, and suites run alphabetically, so a leaked robot breaks the suite that follows.
+  A real `OpenttdAdminHandler.startup()` opens an admin socket (3977..4377) with nothing behind it and logs
+  pairs of `ERROR ~ Connection refused` into `test-result/application.log` — expected noise, not a failure.
+- Static helpers of a test class must not be readable as a property of the `Class` object (see the `get(String)`
+  gotcha below): the `app/openttd` helpers in `test/BaseOpenttdTest.java` are `clientHeld()` / `holdClient(...)`,
+  never `getClient()` / `setClient(...)`.
+- A stale `play test` JVM keeps port 9000 and JPDA 8002 and answers `/@tests.list` from the sources it
+  compiled at start-up. Kill it with `pgrep -f "^/home/eric/www/tools/jdk-17/bin/java"` — `pgrep -af
+  "play.server.Server"` matches the bash wrapper too and kills the command that is running.
 
 ### Test-class gotcha: never name a static helper `get(String)`
 

@@ -41,10 +41,12 @@ public class Message extends Model {
 	}
 
 	public static List<Message> outbox(User user, int page, int pagesize) {
-		return find("from", user).fetch(page, pagesize);
+		// "from" is a reserved word in HQL, so find("from", user) cannot be parsed. The entity is
+		// aliased, which makes m.from a property path. The column itself is from_id, so SQL is fine.
+		return find("select m from Message m where m.from = ?1", user).fetch(page, pagesize);
 	}
 
 	public static long outboxCount(User user) {
-		return count("from", user);
+		return count("select count(*) from Message m where m.from = ?1", user);
 	}
 }

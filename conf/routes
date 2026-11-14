@@ -45,7 +45,10 @@ POST	/forgottenEmail		forum.Users.showEmail
 GET		/users/{<[0-9]+>id}	forum.Users.show
 
 # Attachments
-GET		/attachments/{<[0-9]+>attachmentId}	forum.Attachments.download
+# The route argument must be named id: forum.Attachments.download(Long id) is bound by
+# parameter name, so an argument called attachmentId left id null and every download
+# failed with "id to load is required for loading".
+GET		/attachments/{<[0-9]+>id}	forum.Attachments.download
 
 # Leaderboard
 GET		/scores				openttd.Scores.index

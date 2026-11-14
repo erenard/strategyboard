@@ -1,6 +1,6 @@
 #{extends 'main.html' /}
 #{set title: user.name/}
-#{set subtitle: 'Inbox'/}
+#{set subtitle: 'Outbox'/}
 
 <table>
 	<thead>
@@ -11,7 +11,7 @@
 		</tr>
 	</thead>
 	<tbody>
-#{list items:messages, as:'message'}
+#{list items:userMessages, as:'message'}
 		<tr>
 			<td class="main">${message.to.name}</td>
 			<td class="main">${message.subject}</td>

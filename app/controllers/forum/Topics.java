@@ -28,6 +28,9 @@ public class Topics extends Application {
 			forbidden("This topic is hidden.");
 		} else {
 			topic.views += 1;
+			// save() is required: Play's Hibernate setup does not flush a plain field mutation, so
+			// without it the increment never reaches the row.
+			topic.save();
 			render(topic, page);
 		}
 	}
@@ -120,6 +123,9 @@ public class Topics extends Application {
 		Topic topic = Topic.findById(topicId);
 		notFoundIfNull(topic);
 		topic.hidden = !topic.hidden;
+		// save() is required: Play's Hibernate setup does not flush a plain field mutation, so
+		// without it the topic stayed visible while the flash claimed it had been hidden.
+		topic.save();
 		if(topic.hidden) {
 			flash.success("success.topic.hidden");
 		} else {
@@ -138,6 +144,10 @@ public class Topics extends Application {
 		Topic topic = Topic.findById(topicId);
 		notFoundIfNull(topic);
 		topic.locked = !topic.locked;
+		// save() is required: Play's Hibernate setup does not flush a plain field mutation, so
+		// without it the topic stayed unlocked while the flash claimed it had been locked, and the
+		// topic.locked guards of reply() and createReply() let replies through.
+		topic.save();
 		if(topic.locked) {
 			flash.success("success.topic.locked");
 		} else {
@@ -159,6 +169,9 @@ public class Topics extends Application {
 		Forum toForum = Forum.findById(toForumId);
 		notFoundIfNull(toForum);
 		topic.forum = toForum;
+		// save() is required: Play's Hibernate setup does not flush a plain field mutation, so
+		// without it the topic stayed in the source forum while the flash claimed it had been moved.
+		topic.save();
 		flash.success("success.topic.moved");
 		Forums.show(forumId, null);
 	}

@@ -32,7 +32,9 @@ public class Application extends Controller {
 		Forum forum = Forum.find("name", "Home Page").first();
 		List<Topic> news = forum.getTopics(page != null ? page : 1, pageSize);
 		int newsCount = news.size();
-		render(playerScores, news, newsCount);
+		// page must be rendered: index.html passes it to the pagination tag (page: page ?: 1),
+		// and action parameters are not added to renderArgs by the framework.
+		render(playerScores, news, newsCount, page);
 	}
 
 	public static void captcha(String id) {

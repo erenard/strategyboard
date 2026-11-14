@@ -23,5 +23,9 @@
 
 #{secure.check 'moderator'}
 <a class="btn btn-danger" href="@{forum.Topics.lock(topic.forum.id, topic.id)}">(Un)lock</a>
-<a class="btn btn-danger" href="@{forum.Topics.hide(topic.forum.id, topic.id)}">(Un)hide</a>
+<!-- hide is declared as POST in conf/routes, so it must be a form: a plain link is a GET
+and falls through to the catch-all route, which renders the 404 page outside a transaction. -->
+<form role="form" action="@{forum.Topics.hide(topic.forum.id, topic.id)}" method="POST" accept-charset="utf-8">
+    <button class="btn btn-danger" type="submit">(Un)hide</button>
+</form>
 #{/secure.check}

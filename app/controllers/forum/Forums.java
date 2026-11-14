@@ -76,6 +76,9 @@ public class Forums extends Application {
 		Forum forum = Forum.findById(forumId);
 		notFoundIfNull(forum);
 		forum.locked = !forum.locked;
+		// save() is required: Play's Hibernate setup does not flush a plain field mutation, so
+		// without it the forum stayed unlocked while the flash claimed it had been locked.
+		forum.save();
 		if(forum.locked) {
 			flash.success(Messages.get("success.forum.locked"));
 		} else {

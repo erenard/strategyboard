@@ -1,0 +1,86 @@
+# Attachments for forum/Attachments.download() and the CRUD file/relation fields.
+#
+# data.yml has no Attachment row, so these get ids 1..5 in the order below (Fixtures
+# truncates the table through deleteDatabase(), which restarts the auto increment; the
+# Topic and Post inserted before attachment 5 continue the counters of data.yml, so the
+# relations of that row point at topic 6 and post 7).
+#
+# The files live in the directory %test.forum.attachments.path points at
+# (/home/eric/www/upload/test), and each test writes them in its @Before method.
+
+# 1: a small file that is on disk. The download loop always writes the whole 64 KB
+# buffer, so the body of this response is 65536 bytes: 12 bytes of content plus NUL padding.
+models.forum.Attachment(smallFile):
+  post:         "p1"
+  user:         "bob"
+  filename:     report.txt
+  realfilename: probe-report.txt
+  mimetype:     text/plain
+  description:  Small attachment
+  downloads:    1
+  size:         12
+  at:           2024-01-01
+
+# 2: no mimetype, which covers response.setContentTypeIfNotSet() leaving the
+# response contentType null (the attachment mime type is not applied).
+models.forum.Attachment(noMimetype):
+  post:         "p2"
+  user:         "admin"
+  filename:     no-mime.txt
+  realfilename: probe-report.txt
+  downloads:    0
+  size:         12
+  at:           2024-01-02
+
+# 3: a row whose file is never written, so FileInputStream throws FileNotFoundException.
+models.forum.Attachment(fileAbsent):
+  post:         "p3"
+  user:         "modo"
+  filename:     absent.txt
+  realfilename: probe-absent.txt
+  mimetype:     text/plain
+  description:  Attachment with no file on disk
+  downloads:    0
+  size:         8
+  at:           2024-01-03
+
+# 4: bigger than the 64 KB read buffer, so the while loop runs twice.
+models.forum.Attachment(largeFile):
+  post:         "p4"
+  user:         "admin"
+  filename:     large.bin
+  realfilename: probe-large.bin
+  mimetype:     application/octet-stream
+  downloads:    2
+  size:         70000
+  at:           2024-01-04
+
+# A topic in modoForum1, which sits in the Moderators category where the General group
+# has accessLevel 1 (view). forum/Attachments.download() is @Check(Profile.REPLYER), but
+# its route has no forumId argument, so Profile.Security.check() falls back to Category 2
+# (Main Category) where the General group has reply permission: bob gets 200 for an
+# attachment whose post lives in this view-only forum. See AttachmentsDownloadTest.
+models.forum.Topic(modoTopic):
+  subject: Moderators topic
+  views:   0
+  forum:   "modoForum1"
+  locked:  false
+  hidden:  false
+
+models.forum.Post(modoPost):
+  subject:   Moderators topic
+  content:   First post of the moderators topic.
+  postedAt:  2024-01-05
+  postedBy:  "modo"
+  topic:     "modoTopic"
+
+# 5: the attachment in that view-only forum.
+models.forum.Attachment(viewOnlyForum):
+  post:         "modoPost"
+  user:         "bob"
+  filename:     view-only.txt
+  realfilename: probe-report.txt
+  mimetype:     text/plain
+  downloads:    0
+  size:         12
+  at:           2024-01-05
