@@ -1,0 +1,37 @@
+# Fixtures for the OpenTTD server page tests (app/views/openttd/Openttd/index.html),
+# loaded by OpenttdPageTest after test/data.yml.
+#
+# Scenario ids must be 1..5 in the order below. Fixtures assigns ids from the per-table
+# sequence in the order the entries appear, and Scenario.getImage()/getTrainImage() switch
+# on Id.fromValue(id) (HighSpeed=1, Toyland=2, Artic=3, Desertic=4, Steam=5).
+# OpenttdServer.getStatus() looks the scenario up by RobotConfiguration.scenarioId, so a
+# missing scenario makes every status panel fall back to "Server is down :(".
+#
+# Played games and their scores are created in Java with dates relative to now:
+# showRecentGames and showBestGames render end.since(), which is a relative string.
+#
+# Like index-data.yml, this file is rendered as a Play template before being parsed as
+# YAML, so it must not contain any play tag or dollar expression.
+
+models.leaderboard.Game(openttdGame):
+  name: OpenTTD goal games
+
+models.leaderboard.Scenario(highSpeedScenario):
+  name: HighSpeed Scenario
+  game:  "openttdGame"
+
+models.leaderboard.Scenario(toylandScenario):
+  name: Toyland Scenario
+  game:  "openttdGame"
+
+models.leaderboard.Scenario(articScenario):
+  name: Artic Scenario
+  game:  "openttdGame"
+
+models.leaderboard.Scenario(deserticScenario):
+  name: Desertic Scenario
+  game:  "openttdGame"
+
+models.leaderboard.Scenario(steamScenario):
+  name: Steam Scenario
+  game:  "openttdGame"

@@ -1,0 +1,111 @@
+# Fixtures for the leaderboard page tests (app/views/openttd/Scores/show.html), loaded by
+# ScoresPageTest after test/data.yml.
+#
+# Twelve players, deliberately without any PlayedGameScore: the empty list path of the
+# template is the default state, and each test seeds only the scores it asserts. Their ids
+# follow test/data.yml's four users (admin=1, modo=2, bob=3, anonymous=4), so they are 5..16
+# in the order below, which makes getPlayerScores()' "order by 1 desc, 3 desc, 2 asc"
+# tie-break (user id ascending) assertable.
+#
+# nbScores is PlayedGameScore.count(from, to), i.e. the number of DISTINCT players in the
+# period, not the number of score rows: a player with two score rows counts once there and
+# twice in the Games column.
+#
+# Like index-data.yml, this file is rendered as a Play template before being parsed as YAML,
+# so it must not contain any play tag or dollar expression.
+
+models.forum.User(scorePlayer01):
+  email:        player01@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 01
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer02):
+  email:        player02@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 02
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer03):
+  email:        player03@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 03
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer04):
+  email:        player04@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 04
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer05):
+  email:        player05@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 05
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer06):
+  email:        player06@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 06
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer07):
+  email:        player07@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 07
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer08):
+  email:        player08@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 08
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer09):
+  email:        player09@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 09
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer10):
+  email:        player10@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 10
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer11):
+  email:        player11@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 11
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(scorePlayer12):
+  email:        player12@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Score Player 12
+  group:        "users"
+  active:       true
+  confirmed:    true

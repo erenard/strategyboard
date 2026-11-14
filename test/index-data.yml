@@ -1,0 +1,100 @@
+# Fixtures for the home page tests (app/views/Application/index.html), loaded by
+# IndexPageTest after test/data.yml.
+#
+# Relations below may reference data.yml aliases ("homePage", "users"): Fixtures keeps
+# the alias -> primary key cache in a static field for the whole JVM run, and nothing
+# deletes rows between the two loads.
+#
+# This file is rendered as a Play template before being parsed as YAML, so it must not
+# contain any play tag or dollar expression.
+
+models.forum.User(indexUser):
+  email:        index@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         Index User
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+models.forum.User(newsAuthor):
+  email:        news@domain.com
+  passwordHash: 5ebe2294ecd0e0f08eab7690d2a6ee69
+  name:         News Author
+  group:        "users"
+  active:       true
+  confirmed:    true
+
+# Newest topic that has attachments: the three rows below cover both branches of
+# attachments.html (description, downloads) and both forms of pluralize.html.
+
+models.forum.Topic(newsTopic):
+  subject: News with attachments
+  views:   0
+  forum:   "homePage"
+  locked:  false
+  hidden:  false
+
+models.forum.Post(newsPost):
+  subject:   News with attachments
+  content:   Body of the news post carrying attachments.
+  postedAt:  2024-01-07
+  postedBy:  "newsAuthor"
+  topic:     "newsTopic"
+
+models.forum.Attachment(withDescriptionAndTwoDownloads):
+  post:         "newsPost"
+  user:         "newsAuthor"
+  filename:     report.txt
+  realfilename: report.txt
+  mimetype:     text/plain
+  # Must not contain the subject of another news topic: the tests locate news panels
+  # by subject, and "First news attachment" would match "First news".
+  description:  Attachment report
+  downloads:    2
+  size:         12
+  at:           2024-01-07
+
+models.forum.Attachment(withoutDescriptionAndNoDownloads):
+  post:         "newsPost"
+  user:         "newsAuthor"
+  filename:     chart.png
+  realfilename: chart.png
+  downloads:    0
+  size:         40
+  at:           2024-01-07
+
+models.forum.Attachment(singleDownload):
+  post:         "newsPost"
+  user:         "newsAuthor"
+  filename:     single.txt
+  realfilename: single.txt
+  downloads:    1
+  size:         8
+  at:           2024-01-07
+
+# Newest news of all, and deliberately without attachments: covers the empty branch of
+# attachments.html and the newline path of showNews.html (nl2br turns them into br tags).
+
+models.forum.Topic(plainTopic):
+  subject: Plain news
+  views:   0
+  forum:   "homePage"
+  locked:  false
+  hidden:  false
+
+models.forum.Post(plainPost):
+  subject:  Plain news
+  postedAt: 2024-01-08
+  postedBy: "newsAuthor"
+  topic:    "plainTopic"
+  content: |
+    First line of the plain news
+    Second line of the plain news
+
+models.forum.Message(unreadForIndexUser):
+  from:    "newsAuthor"
+  to:      "indexUser"
+  at:      2024-01-01
+  subject: Unread message
+  content: Read me
+  readed:  false
