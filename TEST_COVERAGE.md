@@ -5,15 +5,15 @@ Notes on what was done, what the assertions pin, what was left uncovered and why
 
 ## Status
 
-Run on 2026-11-21, in a shell that sourced `tools/env.sh`, from `strategyboard/`:
+Run on 2026-11-22, in a shell that sourced `tools/env.sh`, from `strategyboard/`:
 
 - `play check` → exit 0
 - `play precompile` → exit 0
-- `play auto-test` → exit 0, `test-result/result.passed`, `~ All tests passed`, ~53 s wall clock
-- 56 Java suites + 2 Selenium suites (`Application.test.html`, `Forum.test.html`), **647 tests, 0 failures, 0 errors** across the `TEST-*.xml` reports
+- `play auto-test` → exit 0, `test-result/result.passed`, `~ All tests passed`, ~52 s wall clock
+- 56 Java suites + 2 Selenium suites (`Application.test.html`, `Forum.test.html`), **659 tests, 0 failures, 0 errors** across the `TEST-*.xml` reports
 
-Before this task there were 6 Java suites (25 tests) plus the 2 Selenium suites. The task added 49 suites
-and 607 tests. The test sources are committed on `master` (`full test coverage for application.html`); the
+Before this task there were 6 Java suites (25 tests) plus the 2 Selenium suites. The task added 51 suites
+and 657 tests. The test sources are committed on `master` (`full test coverage for application.html`); the
 scratch probe suites used to read the behaviour were deleted after transcription, and `conf/application.conf`
 stays untracked as usual. This file and the `AGENTS.md` updates below it are not committed yet.
 
@@ -36,8 +36,8 @@ and the app log duplicated into `test-result/application.log`.
 - Extra fixtures live in new files (`test/index-data.yml`, `test/scores-data.yml`, `test/openttd-data.yml`,
   `test/attachments-data.yml`); `test/data.yml` was never edited.
 
-The five bases are abstract and `TemplateStandIns` is not a test class, so `test/` holds 60 `*Test.java`
-files while the runner lists 55 suites.
+The five bases are abstract and `TemplateStandIns` is not a test class, so `test/` holds 61 `*Test.java`
+files while the runner lists 56 suites.
 
 Assertions pin exact observed values rather than plausible ones: every string below was read from a scratch
 probe run against the real framework, and the probe was deleted afterwards. Where a value cannot be pinned
@@ -47,17 +47,17 @@ probe run against the real framework, and the probe was deleted afterwards. Wher
 
 | Area | Suites | Tests |
 | --- | --- | --- |
-| CRUD admin pages (`app/controllers/admin/`, CRUD module) | 9 | 163 |
-| Controller actions and tasks | 6 | 50 |
-| Models (`app/models/`) | 17 | 161 |
+| CRUD admin pages (`app/controllers/admin/`, CRUD module) | 9 | 164 |
+| Controller actions and tasks | 8 | 77 |
+| Models (`app/models/`) | 17 | 163 |
 | `app/openttd/` | 3 | 30 |
-| Pages, templates, tags, roles | 20 | 228 |
+| Pages, templates, tags, roles | 20 | 248 |
 
 | Suite | Tests | What it holds |
 | --- | --- | --- |
 | `CrudAdminAttachmentsTest` | 21 | `controllers.admin.AdminAttachments` (CRUD over `Attachment`): list rows, the optional `(None)` relation options, `mimetype`/`filename`/`realfilename` (`@Required`), `at` as `yyyy-MM-dd`, create/update/delete |
 | `CrudAdminCategoriesTest` | 18 | `controllers.admin.AdminCategories` over `Category`: `name` (`@MaxSize(50)`), `displayOrder`, and the `crud_unknown` block a `@OneToMany` renders (posting `object.forums.id` changes nothing) |
-| `CrudAdminForumsTest` | 20 | `controllers.admin.AdminForums` over `Forum`: text, long text, number, category select, locked checkbox, `crud_unknown` for `topics`, validation and delete |
+| `CrudAdminForumsTest` | 20 | `controllers.admin.AdminForums` over `Forum`: text, long text, number, category select, the `locked` checkbox (`crud.checkField` posts a false input when the box is absent, so an omitted flag writes false), `crud_unknown` for `topics`, validation and delete |
 | `CrudAdminPagesTest` | 8 | `app/views/admin/AdminForums/list.html` and `AdminCategories/list.html`, the two list templates the app overrides inside the CRUD layout |
 | `CrudAdminPermissionsTest` | 19 | `controllers.admin.AdminPermissions` over `Permission`: the two `@ManyToOne` ids (`object.category.id`, `object.group.id`), `accessLevel`, and `toString()` as the breadcrumb and row label |
 | `CrudAdminTopicsTest` | 20 | `controllers.admin.AdminTopics` over `Topic`: forum relation with `(None)`, `views`, locked/hidden, `crud_unknown` for posts, and the empty POST that creates a row because nothing is `@Required` |
@@ -66,16 +66,16 @@ probe run against the real framework, and the probe was deleted afterwards. Wher
 | `CrudIndexForbiddenTest` | 8 | `controllers.CRUD.index()` reached as `/crud`, `/crud/index`, `/admin` and `/admin/`: the module class forbids itself (403 for everybody, anonymous included), the mounted root page renders and sends an anonymous visitor to `/login` |
 | `AttachmentsDownloadTest` | 11 | `forum.Attachments.download()` as `GET /attachments/{id}`: unknown id → 404, the file served, missing file on disk, forum/topic visibility, anonymous and logged-in |
 | `TopicsDeleteTest` | 9 | `forum.Topics.delete()` as POST only: unknown id → 404, hidden topic, moderator and administrator paths, cascaded posts and counters, the refused deletes |
-| `TopicsLockTest` | 15 | `forum.Topics.lock()` (GET), `hide()` (POST) and `move()` (POST) read back from the row, and the guards that follow: `reply()` / `createReply()` refuse a topic locked through the UI and store no `Post`, the Reply link leaves `Topics/show.html`, a hidden topic is 403 and dropped from `Forums/show.html`, a locked hidden topic is still locked, unknown ids → 404, anonymous → `/login`, replyer → 403 |
+| `TopicsLockTest` | 15 | `forum.Topics.lock()` (GET), `hide()` (POST) and `move()` (POST) read back from the row, and the guards that follow: `reply()` / `createReply()` refuse a topic locked through the UI and store no `Post`, the Reply link leaves `Topics/show.html`, a hidden topic is 403 below `Permission.moderate` and dropped from `Forums/show.html`, a locked hidden topic is still locked and still readable for the moderator who locked it, unknown ids → 404, anonymous → `/login`, replyer → 403 |
 | `LogoutFlowTest` | 12 | `controllers.Secure.login()` / `logout()` plus `Profile.Security.authenticate()`, `onAuthenticated()`, `onDisconnect()`: remember-me cookie, session cookie, flash, the `uuid` login token |
 | `ScoresExportCsvTest` | 6 | `openttd.Scores.exportAsCSV()` and the two routes that reach it: the `@Check(Profile.MODERATOR)` branches, the `text/csv` content type, the empty body the action can only produce |
 | `ExportScoresCsvGeneratorTest` | 6 | `tasks/ExportScoresCsvGenerator` without a request: `hasMoreData()`, the chunk iterator, the `FutureTask` nothing ever starts |
 | `LegacyMd5Test` | 6 | `controllers/legacy/MD5.crypt()` and `User.checkPassword()` against a legacy hash; the empty/null guard, and the `NoSuchAlgorithmException` catch that is unreachable |
-| `AttachmentModelTest`, `CategoryModelTest`, `ForumModelTest`, `GameModelTest`, `MessageTest`, `PermissionModelTest`, `PlayedGameModelTest`, `PlayedGameScoreModelTest`, `PlayerScoreTest`, `PostModelTest`, `RobotConfigurationTest`, `ScenarioModelTest`, `TopicModelTest`, `OpenttdServerTest`, `UserGroupModelTest`, `UserModelTest`, `UserTest` | 161 | Every model of `app/models/forum/`, `app/models/leaderboard/`, `app/models/openttd/`: finders, pagination, ordering, validation, the counters a cascade moves, and the delete branches a foreign key refuses |
+| `AttachmentModelTest`, `CategoryModelTest`, `ForumModelTest`, `GameModelTest`, `MessageTest`, `PermissionModelTest`, `PlayedGameModelTest`, `PlayedGameScoreModelTest`, `PlayerScoreTest`, `PostModelTest`, `RobotConfigurationTest`, `ScenarioModelTest`, `TopicModelTest`, `OpenttdServerTest`, `UserGroupModelTest`, `UserModelTest`, `UserTest` | 162 | Every model of `app/models/forum/`, `app/models/leaderboard/`, `app/models/openttd/`: finders, pagination, ordering, validation, the counters a cascade moves, and the delete branches a foreign key refuses. `Category.getVisibleTopicsCount()` / `getVisiblePostsCount()` drop `Topic.hidden`, and are read through the entity's own paths (`Topic.count("hidden = false")`, not `topic.hidden = false`) |
 | `OpenttdServiceTest` | 18 | `identifyUser`, `saveGame`, `endGame`, `exposeGame` / `getGame` |
 | `OpenttdAdminHandlerTest` | 8 | Singleton, `robots` map, `isRunning`, `restart`, `shutdown`, `startup` of an unmapped scenario |
 | `OpenttdClientHandlerTest` | 4 | Singleton, `client` field, `isRunning`, `shutdown` |
-| `IndexPageTest`, `ForumsPageTest`, `TopicsPageTest`, `MessagesPageTest`, `UsersPageTest`, `ScoresPageTest`, `OpenttdPageTest`, `LoginPageTest`, `ErrorPagesTest`, `Html5PagesTest`, `CategoriesViewsTest`, `SecureTagsTest`, `TagsTest`, `TagsCallersTest`, `NotifierTemplatesTest`, `AdministratorTest`, `AnonymousTest`, `ModeratorTest`, `ApplicationTest`, `BasicTest` | 228 | Every page template, the tag library of `app/views/tags`, the `Notifier` templates, and the role checks of `controllers.Profile` for administrator / moderator / replyer / anonymous |
+| `IndexPageTest`, `ForumsPageTest`, `TopicsPageTest`, `MessagesPageTest`, `UsersPageTest`, `ScoresPageTest`, `OpenttdPageTest`, `LoginPageTest`, `ErrorPagesTest`, `Html5PagesTest`, `CategoriesViewsTest`, `SecureTagsTest`, `TagsTest`, `TagsCallersTest`, `NotifierTemplatesTest`, `AdministratorTest`, `AnonymousTest`, `ModeratorTest`, `ApplicationTest`, `BasicTest` | 239 | Every page template, the tag library of `app/views/tags`, the `Notifier` templates, and the role checks of `controllers.Profile` for administrator / moderator / replyer / anonymous. `ForumsPageTest` counts visible posts/topics below `Permission.moderate` and full ones at moderate, per category; `IndexPageTest` hides a hidden news topic from everybody; `MessagesPageTest` drives `/messages/inbox` and `/messages/outbox` and the navbar links, and sends an anonymous session to the home page; `UsersPageTest` does the same for `/profile`; `ErrorPagesTest` renders `errors/403.html`, `errors/500.html` and `errors/404.html`, and asserts the `NotFound` an unmatched url raises plus the 404 page rendered without an EntityManager |
 
 ## Defects the tests pinned (application code left as it is)
 
@@ -177,7 +177,7 @@ These were found by the suites and corrected in the application, not worked arou
 - `conf/routes` binds the attachment route argument as `id`, matching `forum.Attachments.download(Long id)`:
   with `attachmentId` the parameter stayed null and every download failed with "id to load is required".
 
-Added on 2026-11-21, found by `TopicsLockTest`:
+Added on 2026-11-21, found by `TopicsLockTest` and by an administrator reading a hidden topic:
 
 - `Topics.lock()`, `Topics.hide()` and `Topics.move()` call `save()` after the field mutation, for the same
   reason `Forums.lock()` does. Without it the row kept its old value while `flash.success()` announced the
@@ -190,6 +190,47 @@ Added on 2026-11-21, found by `TopicsLockTest`:
   (`JPAException: No active EntityManager`, because `PlayHandler.serve404()` renders `main.html` whose
   `#{secure.check}` tag queries `User.findByEmail()` outside a transaction). `(Un)lock` stays a GET link —
   its route is GET, and `ModeratorTest.canLockATopic()` drives it as such.
+- `Topics.show()` gates `topic.hidden` on `accessLevel() < Permission.moderate` instead of forbidding on the
+  flag alone. It used to answer 403 for everybody, admins included, while `Forums.show()` lists hidden topics
+  to anyone at `Permission.moderate` or above: the forum page offered the link and the topic page refused it.
+  A moderator or an administrator now reads it (and the view counter increments); anonymous (`Permission.view`
+  = 1) and a replyer (`Permission.post` = 3) still get 403. `AdministratorTest`, `ModeratorTest` and
+  `TopicsPageTest` pinned the old 403-for-everybody behaviour and now pin the boundary;
+  `TopicsPageTest.hiddenTopicKeepsItsViewCountForAProfileBelowModerate` pins that a refused read does not
+  increment `views`. `Topics.reply()` and `Attachments.download()` ignore `hidden`, so a replyer who knows the
+  url can still reply to or download from a hidden topic — `replyFormOnAHiddenTopicIsRenderedBecauseReplyIgnoresHidden`
+  keeps that as today's behaviour. `Application.index()` no longer lists hidden topics on the public
+  homepage — see the 2026-11-22 block below.
+
+Added on 2026-11-22, found by an anonymous `/profile`, and by curl against `play run`:
+
+- Visibility is a topic property only: `models.forum.Forum` carries `locked` and nothing else, and the
+  production `Forum` table is `id, description, displayOrder, locked, name, category_id`. `Topics.show()`
+  refuses a hidden topic below `Permission.moderate` only, `Forums.index()` counts topics and posts per
+  category through `Category.getVisibleTopicsCount()` / `getVisiblePostsCount()` below that level, and
+  `Application.index()` reads `getVisibleTopics()`.
+- `Profile.Security.check()` wraps `User.findByEmail()` in a `try` and answers false when it raises.
+  `PlayHandler.serve404()` renders `errors/404.html` - and `main.html`, with its `#{secure.check}` tags -
+  outside any controller, so no JPA interceptor ran and there is no EntityManager; the lookup used to raise
+  `JPAException`, and the unmatched route answered 500 instead of 404. Verified over HTTP: `GET
+  /no/controller/here` and `GET /nope` answer 404 with that page. `play.test.FunctionalTest` calls
+  `Router.route()` itself and lets the `NotFound` escape, so `ErrorPagesTest` asserts the exception and
+  renders the template with the EntityManager unbound rather than a status code.
+- `forum.Users.profile()` / `update()` and `forum.Messages.inbox()` / `outbox()` answer
+  `Application.backToPreviousPage()` when `connectedUser()` is null. `Profile.checkAccess()` puts
+  `anonymous.email` in the session for a `@Check(VIEWER)` GET, and `Security.check("")` only asks whether
+  `User.findByEmail()` answers something, so those `@Check(LOGGED)` actions ran with the anonymous row as
+  their user while `Security.connected()` filtered that address out — `profile.html` and `inbox.html` then
+  dereferenced null and answered 500. The helper redirects to the referer when it is on the same host and
+  is not the current path (a form posts to the page it is on, so `/profile` as its own referer would loop),
+  and otherwise calls `Application.index()`. Play's `ControllersEnhancer` puts an auto-redirect in front of
+  every public static void action, so an action called from another action never runs: it becomes
+  `redirect("Application.index")`, a 302 to `/` through the `GET /` route — the same thing
+  `Profile.Security.onDisconnected()` already does.
+- `app/views/main.html` linked Messages to `href="#"` and never linked the outbox. `conf/routes` declares
+  `GET /messages/inbox` and `GET /messages/outbox` above the catch-all, and the dropdown links both in the
+  badge branch and the plain one. The legacy `/forum.messages/inbox` (the catch-all spelling of the same
+  action) still answers, so it stays asserted.
 
 ## Deliberately uncovered
 
@@ -260,3 +301,50 @@ grep -l 'failures="0"' test-result/TEST-*.xml | wc -l   # 56
 
 The `<testsuite>` attributes are ordered `failures="0" time=... errors="0" skipped="0" tests=... name=...`, so
 an assertion like `grep 'failures="0" errors="0"'` matches nothing.
+
+The three behaviours the fix changes are also checked over real HTTP, because `play.test.FunctionalTest`
+dispatches through `ActionInvoker` and never through `PlayHandler`: the 404 of an unmatched url, and the
+redirects of an anonymous `/profile` and `/messages/inbox`. `jpa.ddl` is `create`, so a server start empties
+the database and `conf/initial-data.yml` is a commented-out stub: the dev rows have to be replayed after the
+first request created the schema. The dump and its replay script lived under `/tmp/opencode/`
+(`www-dev-data-clean.sql` and `restore-dev-data.py`); they are not there now, only
+`/tmp/opencode/prod-schema-check.sql` is. Re-take the dump with `mariadb-dump --complete-insert
+--no-create-info` from the demo state you want, naming every column: `Forum` is
+`id, description, displayOrder, locked, name, category_id`, and `Topic` is
+`id, hidden, locked, views, forum_id`.
+
+```
+python3.11 /tmp/opencode/restore-dev-data.py        # after play run / play test created the schema
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:9000/nope                  # 404
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:9000/no/controller/here    # 404
+curl -s -c /tmp/jar.txt http://localhost:9000/forums > /dev/null                     # session = anonymous
+curl -s -b /tmp/jar.txt -D - -o /dev/null http://localhost:9000/profile              # 302, Location /
+curl -s -b /tmp/jar.txt -D - -o /dev/null http://localhost:9000/messages/inbox       # 302, Location /
+curl -s -b /tmp/jar.txt -D - -o /dev/null http://localhost:9000/messages/outbox      # 302, Location /
+curl -s -b /tmp/jar.txt -D - -o /dev/null http://localhost:9000/forum.messages/inbox # 302, Location /
+curl -s -o /dev/null -w '%{http_code}\n' http://localhost:9000/profile               # 302, Location /login
+curl -s -c /tmp/admin.txt -d 'username=admin@domain.com&password=secret' http://localhost:9000/login
+curl -s -c /tmp/modo.txt  -d 'username=modo@domain.com&password=secret'  http://localhost:9000/login
+curl -s -c /tmp/bob.txt   -d 'username=bob@domain.com&password=secret'   http://localhost:9000/login
+curl -s -b /tmp/modo.txt  -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1              # 200
+curl -s -b /tmp/admin.txt -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1              # 200
+curl -s -b /tmp/bob.txt   -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1              # 200
+curl -s -b /tmp/jar.txt   -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1              # 200
+curl -s -b /tmp/bob.txt   -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1/topics/3    # 403
+curl -s -b /tmp/jar.txt   -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1/topics/3    # 403
+curl -s -b /tmp/modo.txt  -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1/topics/3    # 200
+curl -s -b /tmp/admin.txt -o /dev/null -w '%{http_code}\n' http://localhost:9000/forums/1/topics/3    # 200
+```
+
+`-X POST` matters on the topic routes (`/forums/{id}/topics/{id}/hide`, `.../delete`, `.../move/{to}`): they are
+POST only, so a GET falls through to the catch-all and answers 404 without touching the row. The dev passwords
+are the MD5 of `secret` (`test/data.yml` writes the same hash), which is why these logins work. A forum is open
+to every role that its `Permission` row allows, so `/forums/1` answers 200 for Bob and for the anonymous session
+too; what is gated is the hidden topic: `Permission.moderateMain` = 4 lets the moderator and the administrator
+read `/forums/1/topics/3`, `Permission.postMain` = 3 and `Permission.viewAnonymous` = 1 do not. The header of
+`/forums` follows the same boundary: `5 posts in 4 topics` below moderate, `6 posts in 5 topics` at moderate,
+and the hidden topic never appears in the home page news for any role.
+The navbar renders `href="/messages/inbox"` and `href="/messages/outbox"` for a logged-in session, and only Login
+and Signup for an anonymous one, whose `connectedUser` is null. `/nope` renders `errors/404.html` through
+`main.html` — subtitle "The forum, topic, or post you search does not exist !" and the link back to `/` — with no
+EntityManager bound, which is the case that used to answer 500.

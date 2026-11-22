@@ -515,6 +515,64 @@ public class UsersPageTest extends BaseForumViewTest {
 		Assert.assertEquals("/profile", flashOf(response).get("url"));
 	}
 
+	/**
+	 * A session that holds anonymous@domain.com does pass @Check(LOGGED): Profile.checkAccess() puts that
+	 * address in the session for a @Check(VIEWER) request, and Security.check("") only asks whether a row
+	 * exists. forum.Users.profile() then ran with connectedUser() == null - Security.connected() filters
+	 * the anonymous address out - and profile.html faulted on it. It now answers
+	 * Application.backToPreviousPage(), which with no referer calls Application.index(): Play's
+	 * ControllersEnhancer turns an action called from another action into
+	 * redirect("Application.index"), so the visitor gets a 302 to the home page and never a profile form.
+	 */
+	@Test
+	public void anAnonymousSessionIsSentToTheHomePageFromTheProfileForm() throws Throwable {
+		clearCookies();
+		assertIsOk(GET("/forums"));
+		Assert.assertEquals("anonymous@domain.com", sessionUsername(GET("/forums")));
+
+		Response response = GET("/profile");
+		assertStatus(302, response);
+		assertLocation(response, "/");
+		// Nothing of the form is rendered
+		assertNotContains("Update your user information", markup(response));
+		assertNotContains("name=\"newPassword\"", markup(response));
+	}
+
+	/** The referer branch of backToPreviousPage(): the page the anonymous visitor came from. */
+	@Test
+	public void anAnonymousSessionWithARefererIsSentBackToThePageThatReferredIt() throws Throwable {
+		clearCookies();
+		assertIsOk(GET("/forums"));
+
+		Response response = GETFrom("/forums", "/profile");
+		assertStatus(302, response);
+		assertLocation(response, "/forums");
+	}
+
+	/**
+	 * The form posts to the page it is on, so its referer is /profile itself, and bouncing back there
+	 * would loop: the home page answers instead. Nothing is written, and the anonymous row is untouched.
+	 */
+	@Test
+	public void anAnonymousSessionPostingTheProfileFormIsSentToTheHomePageAndWritesNothing() throws Throwable {
+		clearCookies();
+		assertIsOk(GET("/forums"));
+		Assert.assertEquals("anonymous@domain.com", passwordEmailOf("anonymous@domain.com"));
+		assertNull(passwordHash("anonymous@domain.com"));
+
+		Response response = POSTFrom("/profile", "/profile", form("password", "secret", "email",
+				"other@domain.com", "email2", "other@domain.com", "newPassword", "fresh", "newPassword2",
+				"fresh"));
+		assertStatus(302, response);
+		assertLocation(response, "/");
+		assertNotContains("Your account has been updated", markup(response));
+		assertEmptyMap(flashOf(response));
+
+		Assert.assertEquals("anonymous@domain.com", passwordEmailOf("anonymous@domain.com"));
+		assertNull(passwordHash("anonymous@domain.com"));
+		assertNull(passwordEmailOf("other@domain.com"));
+	}
+
 	@Test
 	public void profileRejectsAShortWrongPasswordOnBothSidesOfTheField() throws Throwable {
 		clearCookies();
@@ -671,12 +729,19 @@ public class UsersPageTest extends BaseForumViewTest {
 		return m.group(1);
 	}
 
+	/** Both answer null when no row holds the address, which is what "nothing was written" needs. */
 	private static String passwordHash(String email) throws Throwable {
-		return inTransaction(() -> User.findByEmail(email).passwordHash);
+		return inTransaction(() -> {
+			User user = User.findByEmail(email);
+			return user == null ? null : user.passwordHash;
+		});
 	}
 
 	private static String passwordEmailOf(String email) throws Throwable {
-		return inTransaction(() -> User.findByEmail(email).email);
+		return inTransaction(() -> {
+			User user = User.findByEmail(email);
+			return user == null ? null : user.email;
+		});
 	}
 
 	private static void loadOpenTTDFixtures() throws Throwable {

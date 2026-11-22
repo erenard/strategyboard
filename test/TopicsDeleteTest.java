@@ -95,7 +95,7 @@ public class TopicsDeleteTest extends BaseForumViewTest {
 		assertSuccessAlert(DELETED_FLASH, markup(GET("/forums/1")));
 	}
 
-	/** A hidden topic is deleted as well, although Topics.show() forbids it for hidden topics. */
+	/** A hidden topic is deleted as well: Topics.show() only forbids it below Permission.moderate. */
 	@Test
 	public void deleteOfAHiddenTopicIsAcceptedByTheAdministrator() throws Throwable {
 		login("admin@domain.com", "secret");

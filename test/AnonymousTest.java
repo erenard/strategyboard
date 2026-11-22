@@ -46,6 +46,8 @@ public class AnonymousTest extends BaseFunctionalTest {
 
 	@Test
 	public void cannotAccessToAHiddenTopic() {
+		// Permission.viewAnonymous gives the anonymous group level 1, under Permission.moderate, so
+		// Topics.show() still refuses the hidden topic.
 		Response response = GET("/forums/1/topics/3");
 		assertEquals(response.status.longValue(), 403);
 		assertContentType("text/html", response);

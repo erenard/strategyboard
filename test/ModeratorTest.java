@@ -63,9 +63,11 @@ public class ModeratorTest extends BaseFunctionalTest {
 	}
 
 	@Test
-	public void cannotAccessToAHiddenTopic() {
+	public void canAccessToAHiddenTopic() {
+		// Topics.show() only forbids a hidden topic below Permission.moderate; Permission.moderateMain
+		// gives this group level 4, so the forum list link it is given works.
 		Response response = GET("/forums/1/topics/3");
-		assertEquals(response.status.longValue(), 403);
+		assertIsOk(response);
 		assertContentType("text/html", response);
 		assertCharset(play.Play.defaultWebEncoding, response);
 	}

@@ -58,12 +58,25 @@ public class TopicsPageTest extends BaseForumViewTest {
 	}
 
 	@Test
-	public void hiddenTopicDoesNotIncrementViewsBecauseShowForbidsBeforeTheIncrement() throws Throwable {
+	public void hiddenTopicKeepsItsViewCountForAProfileBelowModerate() throws Throwable {
 		clearCookies();
-		login("modo@domain.com", "secret");
+		login("bob@domain.com", "secret");
 		Response response = GET("/forums/1/topics/3");
 		assertStatus(403, response);
 		Assert.assertEquals("views=0", dbViews(3L));
+		// Topics.show() forbids before the increment, so a refused read never counts
+		GET("/forums/1/topics/3");
+		Assert.assertEquals("views=0", dbViews(3L));
+	}
+
+	@Test
+	public void hiddenTopicIncrementsViewsForAModerator() throws Throwable {
+		clearCookies();
+		login("modo@domain.com", "secret");
+		assertIsOk(GET("/forums/1/topics/3"));
+		Assert.assertEquals("views=1", dbViews(3L));
+		GET("/forums/1/topics/3");
+		Assert.assertEquals("views=2", dbViews(3L));
 	}
 
 	@Test
@@ -145,13 +158,34 @@ public class TopicsPageTest extends BaseForumViewTest {
 	}
 
 	@Test
-	public void hiddenTopicIsForbiddenForEveryProfile() throws Throwable {
+	public void hiddenTopicIsForbiddenBelowModerateAndReadableAtModerate() throws Throwable {
 		clearCookies();
 		assertForbiddenTopicAs("anonymous@domain.com");
 		clearCookies();
 		assertForbiddenTopicAs("bob@domain.com");
+
+		// Permission.moderateMain = 4 for the Moderators group: the forum list links the hidden topic,
+		// so the page it points at has to render.
 		clearCookies();
-		assertForbiddenTopicAs("admin@domain.com");
+		login("modo@domain.com", "secret");
+		String moderatorBody = markup(GET("/forums/1/topics/3"));
+		assertHeader(moderatorBody, "Topic Hidden", "1 post by 1 user");
+		assertContains("<ol class=\"breadcrumb\"> <li><a href=\"/forums\">Forums</a></li>"
+				+ " <li><a href=\"/forums/1\">mainForum1</a></li> <li class=\"active\">Topic Hidden</li> </ol>",
+				moderatorBody);
+		assertContains("<div class=\"panel-body\"> First post of the hidden topic. </div>", moderatorBody);
+		Assert.assertEquals(1, count("panel panel-default", moderatorBody));
+		// t3 is not locked, so #{ifnot topic.locked} renders the Reply link for a replyer level
+		Assert.assertEquals("[Reply -> /forums/1/topics/3/reply, (Un)lock -> /forums/1/topics/3/lock,"
+				+ " (Un)hide -> POST /forums/1/topics/3/hide]", actionButtons(moderatorBody).toString());
+
+		// Permission.administrate = 5
+		clearCookies();
+		login("admin@domain.com", "secret");
+		String adminBody = markup(GET("/forums/1/topics/3"));
+		assertHeader(adminBody, "Topic Hidden", "1 post by 1 user");
+		assertContains("<div class=\"panel-body\"> First post of the hidden topic. </div>", adminBody);
+		Assert.assertEquals(1, count("panel panel-default", adminBody));
 	}
 
 	private void assertForbiddenTopicAs(String email) throws Throwable {

@@ -7,7 +7,6 @@ import java.util.regex.Pattern;
 import org.junit.*;
 
 import play.mvc.Http.Response;
-import play.mvc.results.NotFound;
 
 import models.forum.Message;
 import models.forum.User;
@@ -23,6 +22,10 @@ import models.forum.User;
  *
  * The outbox lists Message.outbox(user) and says 'Outbox', so the To column shows the recipient.
  * outbox.html has no <h1 id="title"> / <strong> block, unlike inbox.html, which is asserted absent.
+ *
+ * Both actions are @Check(LOGGED). A session holding anonymous@domain.com passes that check, so the two
+ * actions guard on connectedUser() and answer Application.backToPreviousPage(); the cases below pin both
+ * of its branches, and main.html's links to them are asserted too.
  */
 public class MessagesPageTest extends BaseForumViewTest {
 
@@ -36,7 +39,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("bob@domain.com", "secret");
-		Response response = GET("/forum.messages/inbox");
+		Response response = GET("/messages/inbox");
 		assertStatus(200, response);
 		String body = markup(response);
 
@@ -64,7 +67,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("modo@domain.com", "secret");
-		String body = markup(GET("/forum.messages/inbox"));
+		String body = markup(GET("/messages/inbox"));
 
 		assertHeader(body, "Moderator", "Inbox");
 		assertContains("<h1 id=\"title\">Moderator</h1>", body);
@@ -83,7 +86,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("admin@domain.com", "secret");
-		String body = markup(GET("/forum.messages/inbox"));
+		String body = markup(GET("/messages/inbox"));
 
 		assertHeader(body, "Admin", "Inbox");
 		assertContains("<h1 id=\"title\">Admin</h1> <p class=\"light\"> <strong>Inbox</strong> </p>", body);
@@ -102,7 +105,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("bob@domain.com", "secret");
-		String body = markup(GET("/forum.messages/inbox"));
+		String body = markup(GET("/messages/inbox"));
 
 		// #{list items:userMessages} empty branch: the tbody holds nothing
 		assertHeader(body, "Bob", "Inbox");
@@ -121,9 +124,9 @@ public class MessagesPageTest extends BaseForumViewTest {
 		login("bob@domain.com", "secret");
 		setPageSize(2);
 		try {
-			Assert.assertEquals(2, tableRows(markup(GET("/forum.messages/inbox"))).size());
+			Assert.assertEquals(2, tableRows(markup(GET("/messages/inbox"))).size());
 
-			String secondPage = markup(GET("/forum.messages/inbox?page=2"));
+			String secondPage = markup(GET("/messages/inbox?page=2"));
 			assertHeader(secondPage, "Bob", "Inbox");
 			assertContains("<h1 id=\"title\">Bob</h1>", secondPage);
 			assertContains("<tbody> </tbody>", secondPage);
@@ -146,7 +149,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("admin@domain.com", "secret");
-		String body = markup(GET("/forum.messages/outbox"));
+		String body = markup(GET("/messages/outbox"));
 
 		assertHeader(body, "Admin", "Outbox");
 		Assert.assertEquals("[To, Subject, Since]", tableHeaders(body).toString());
@@ -172,7 +175,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("bob@domain.com", "secret");
-		String body = markup(GET("/forum.messages/outbox"));
+		String body = markup(GET("/messages/outbox"));
 
 		assertHeader(body, "Bob", "Outbox");
 		List<String> rows = tableRows(body);
@@ -191,7 +194,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("bob@domain.com", "secret");
-		String body = markup(GET("/forum.messages/outbox"));
+		String body = markup(GET("/messages/outbox"));
 
 		// outbox.html has no <h1 id="title"> / <strong> block, unlike inbox.html
 		assertHeader(body, "Bob", "Outbox");
@@ -209,9 +212,9 @@ public class MessagesPageTest extends BaseForumViewTest {
 		login("admin@domain.com", "secret");
 		setPageSize(2);
 		try {
-			Assert.assertEquals(2, tableRows(markup(GET("/forum.messages/outbox"))).size());
+			Assert.assertEquals(2, tableRows(markup(GET("/messages/outbox"))).size());
 
-			String secondPage = markup(GET("/forum.messages/outbox?page=2"));
+			String secondPage = markup(GET("/messages/outbox?page=2"));
 			assertHeader(secondPage, "Admin", "Outbox");
 			List<String> rows = tableRows(secondPage);
 			Assert.assertEquals(1, rows.size());
@@ -234,7 +237,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 			return null;
 		});
 		login("modo@domain.com", "secret");
-		String body = markup(GET("/forum.messages/outbox"));
+		String body = markup(GET("/messages/outbox"));
 
 		assertHeader(body, "Moderator", "Outbox");
 		assertContains("<tbody> </tbody>", body);
@@ -242,7 +245,7 @@ public class MessagesPageTest extends BaseForumViewTest {
 
 		// Moderator still has the message Admin sent to it
 		assertContains("<td class=\"main\">Admin</td> <td class=\"main\">Message admin to modo</td>",
-				markup(GET("/forum.messages/inbox")));
+				markup(GET("/messages/inbox")));
 	}
 
 	// ~~~~~~~~~~~~ access to the actions
@@ -250,34 +253,114 @@ public class MessagesPageTest extends BaseForumViewTest {
 	@Test
 	public void inboxIsNotReachableWithoutLogin() throws Throwable {
 		clearCookies();
-		Response response = GET("/forum.messages/inbox");
+		Response response = GET("/messages/inbox");
 		assertStatus(302, response);
 		assertLocation(response, "/login");
-		Assert.assertEquals("/forum.messages/inbox", flashOf(response).get("url"));
+		Assert.assertEquals("/messages/inbox", flashOf(response).get("url"));
 	}
 
 	@Test
 	public void outboxIsNotReachableWithoutLogin() throws Throwable {
 		clearCookies();
-		Response response = GET("/forum.messages/outbox");
+		Response response = GET("/messages/outbox");
 		assertStatus(302, response);
 		assertLocation(response, "/login");
-		Assert.assertEquals("/forum.messages/outbox", flashOf(response).get("url"));
+		Assert.assertEquals("/messages/outbox", flashOf(response).get("url"));
 	}
 
+	/**
+	 * conf/routes declares /messages/inbox and /messages/outbox above the catch-all, which is what
+	 * @{forum.Messages.inbox()} in main.html resolves to. The /forum.messages/inbox url the catch-all
+	 * used to answer is still served.
+	 */
 	@Test
-	public void theUnroutedMessagesPathIsNotFound() throws Throwable {
+	public void bothPagesAreReachedByTheirOwnRouteAndByTheCatchAllUrl() throws Throwable {
 		clearCookies();
 		login("bob@domain.com", "secret");
 
-		// conf/routes has no route for Messages; only the catch-all * /{controller}/{action} reaches it,
-		// and it resolves forum.messages, not messages.
-		try {
-			GET("/messages/inbox");
-			fail("expected NotFound for /messages/inbox");
-		} catch (NotFound e) {
-			assertContains("messages.inbox action not found", e.getMessage());
-		}
+		assertHeader(markup(GET("/messages/inbox")), "Bob", "Inbox");
+		assertHeader(markup(GET("/messages/outbox")), "Bob", "Outbox");
+		assertHeader(markup(GET("/forum.messages/inbox")), "Bob", "Inbox");
+		assertHeader(markup(GET("/forum.messages/outbox")), "Bob", "Outbox");
+	}
+
+	/**
+	 * main.html linked Messages to href="#" and never linked the outbox. Both links now point at the
+	 * routes above, in both branches of #{if connectedUser.newMessagesCount > 0}.
+	 */
+	@Test
+	public void theNavbarDropdownLinksToTheInboxAndToTheOutbox() throws Throwable {
+		clearCookies();
+		inTransactionVoid(() -> {
+			seedMessages();
+			return null;
+		});
+		login("bob@domain.com", "secret");
+		// Bob has two unread messages -> the badge branch
+		String badgeBody = markup(GET("/forums"));
+		assertContains("<a href=\"/messages/inbox\"><span class=\"badge pull-right\">2</span>Messages</a>", badgeBody);
+		assertContains("<a href=\"/messages/outbox\">Sent messages</a>", badgeBody);
+		// The old dead link, href="#" on the badge, is gone
+		assertNotContains("<a href=\"#\"><span class=\"badge pull-right\">", badgeBody);
+
+		// Admin receives "Message from Bob", unread -> badge branch again, with 1
+		clearCookies();
+		login("admin@domain.com", "secret");
+		String oneBadge = markup(GET("/forums"));
+		assertContains("<a href=\"/messages/inbox\"><span class=\"badge pull-right\">1</span>Messages</a>", oneBadge);
+		assertContains("<a href=\"/messages/outbox\">Sent messages</a>", oneBadge);
+
+		// With nothing left in its inbox the plain branch is taken: Moderator keeps one message in
+		// seedMessages(), so it is removed first
+		clearCookies();
+		inTransactionVoid(() -> {
+			deleteMessagesAddressedTo("modo@domain.com");
+			return null;
+		});
+		login("modo@domain.com", "secret");
+		String plainBody = markup(GET("/forums"));
+		assertContains("<a href=\"/messages/inbox\">Messages</a>", plainBody);
+		assertContains("<a href=\"/messages/outbox\">Sent messages</a>", plainBody);
+		assertNotContains("badge pull-right", plainBody);
+	}
+
+	/**
+	 * The anonymous session passes @Check(LOGGED): Profile.checkAccess() puts anonymous.email in it for a
+	 * @Check(VIEWER) request and Security.check("") only asks whether a row exists, so forum.Messages runs
+	 * with connectedUser() == null. It answers Application.backToPreviousPage() instead of faulting on a
+	 * null user; with no referer that calls Application.index(), which Play's ControllersEnhancer turns
+	 * into a 302 to the home page.
+	 */
+	@Test
+	public void anAnonymousSessionIsSentToTheHomePageFromBothPages() throws Throwable {
+		clearCookies();
+		assertIsOk(GET("/forums"));
+		assertEquals("anonymous@domain.com", sessionUsername(GET("/forums")));
+
+		Response inbox = GET("/messages/inbox");
+		assertStatus(302, inbox);
+		assertLocation(inbox, "/");
+		assertNotContains(">Inbox</strong>", markup(inbox));
+
+		Response outbox = GET("/messages/outbox");
+		assertStatus(302, outbox);
+		assertLocation(outbox, "/");
+		assertNotContains(">Outbox</p>", markup(outbox));
+	}
+
+	/** The referer branch of backToPreviousPage(): the page that referred the visitor here. */
+	@Test
+	public void anAnonymousSessionWithARefererIsSentBackToThePageThatReferredIt() throws Throwable {
+		clearCookies();
+		assertIsOk(GET("/forums"));
+
+		Response inbox = GETFrom("/forums/1", "/messages/inbox");
+		assertStatus(302, inbox);
+		assertLocation(inbox, "/forums/1");
+
+		Response outbox = GETFrom("/forums/1/topics/1", "/messages/outbox");
+		assertStatus(302, outbox);
+		assertLocation(outbox, "/forums/1/topics/1");
 	}
 
 	// ~~~~~~~~~~~~ helpers

@@ -17,7 +17,10 @@ import play.mvc.Http.Response;
  *     and auto-test runs in DEV, so the PROD branch needs Play.mode switched. It is a public static
  *     field, and every case restores it before it returns.
  *   - errors/404.html is reached by a real request: forum.Users.confirmRegistration calls
- *     notFoundIfNull() for an unknown uuid.
+ *     notFoundIfNull() for an unknown uuid, and ActionInvoker.resolve() turns an unknown controller
+ *     into the same NotFound. A url no route matches at all reaches it through
+ *     PlayHandler.serve404(), outside any transaction; that one answered 500 until
+ *     Profile.Security.check() started refusing User.findByEmail() without an EntityManager.
  *
  * Both sides of exception instanceof play.exceptions.PlayException are exercised in PROD: one render
  * with a PlayException (UnexpectedException, which has an id) writes the logged-id paragraph, one with
@@ -170,5 +173,78 @@ public class ErrorPagesTest extends BaseForumViewTest {
 		// title is Forbidden but its subtitle is its own sentence, not the one of errors/403.html
 		assertHeader(body, "Forbidden", "The forum, topic, or post you search does not exist !");
 		assertContains("<p> Please go back to the <a href=\"/\">home page</a>. </p>", body);
+	}
+
+	/**
+	 * A url the catch-all routes do not match - three segments, so neither /{controller} nor
+	 * /{controller}/{action} - is answered by Router.route() raising NotFound. Over HTTP
+	 * PlayHandler.serve404() catches it and renders errors/404.html outside any controller, so no JPA
+	 * interceptor ran and main.html's #{secure.check} tags reach Profile.Security.check() ->
+	 * User.findByEmail() with no EntityManager. That used to raise JPAException, which PlayHandler
+	 * turned into a 500; the check now answers false for the lookup, so the page renders. Verified over
+	 * real HTTP against play run: GET /no/controller/here answers 404 with that page.
+	 *
+	 * play.test.FunctionalTest calls Router.route() itself and lets the NotFound escape, so the suite
+	 * asserts the exception, then renders the same template with the EntityManager unbound.
+	 */
+	@Test
+	public void anUnmatchedUrlRaisesNotFoundAndItsPageRendersWithoutAnEntityManager() throws Throwable {
+		clearCookies();
+		try {
+			GET("/no/controller/here");
+			throw new AssertionError("expected play.mvc.results.NotFound for GET /no/controller/here");
+		} catch (play.mvc.results.NotFound nf) {
+			assertContains("GET /no/controller/here", String.valueOf(nf.getMessage()));
+		}
+
+		Map<String, Object> args = viewArgs("anonymous@domain.com", "/no/controller/here");
+		// serve404() renders outside any controller, so Application.globals() never ran and renderArgs
+		// holds no connectedUser. A User must not be given here: main.html reads
+		// connectedUser.newMessagesCount, which counts messages and needs an EntityManager.
+		args.put("connectedUser", null);
+		args.put("result", new play.mvc.results.NotFound("GET /no/controller/here"));
+		String body = renderViewWithoutEntityManager("errors/404.html", args);
+		assertNotFoundBody(body);
+		assertContains("<p> Please go back to the <a href=\"/\">home page</a>. </p>", body);
+		// renderArgs holds no connectedUser outside a controller, so main.html takes its anonymous branch
+		assertContains(">Login</a>", body);
+		assertNotContains(">Logout</a>", body);
+	}
+
+	/** The same render with a session in it: the check still finds no EntityManager and answers false. */
+	@Test
+	public void anUnmatchedUrlRendersItsPageWithoutAnEntityManagerForAConnectedSession() throws Throwable {
+		clearCookies();
+		Map<String, Object> args = viewArgs("admin@domain.com", "/no/controller/here");
+		args.put("connectedUser", null);
+		args.put("result", new play.mvc.results.NotFound("GET /no/controller/here"));
+		String body = renderViewWithoutEntityManager("errors/404.html", args);
+		assertNotFoundBody(body);
+		assertContains(">Login</a>", body);
+		assertNotContains(">Logout</a>", body);
+	}
+
+	/**
+	 * Two more ways to reach a 404. A POST on a url with no route raises the same NotFound. /nope
+	 * matches /{controller} and so asks for controllers.nope.index: ActionInvoker.resolve() turns that
+	 * ActionNotFoundException into a NotFound - "nope.index action not found" - which PlayHandler
+	 * answers with errors/404.html over HTTP.
+	 */
+	@Test
+	public void anUnmatchedUrlRaisesNotFoundForAnUnknownControllerAndForAPost() throws Throwable {
+		clearCookies();
+		try {
+			POST("/no/controller/here", form());
+			throw new AssertionError("expected play.mvc.results.NotFound for POST /no/controller/here");
+		} catch (play.mvc.results.NotFound nf) {
+			assertContains("POST /no/controller/here", String.valueOf(nf.getMessage()));
+		}
+
+		try {
+			GET("/nope");
+			throw new AssertionError("expected play.mvc.results.NotFound for GET /nope");
+		} catch (play.mvc.results.NotFound nf) {
+			assertContains("nope.index action not found", String.valueOf(nf.getMessage()));
+		}
 	}
 }

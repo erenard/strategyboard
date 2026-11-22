@@ -29,8 +29,10 @@ import models.forum.Topic;
  *     is accepted and stores a Post.
  *   - app/views/forum/Topics/show.html drops the Reply link for a topic locked through the UI, which is the
  *     #{ifnot topic.locked} branch TopicsPageTest only ever exercised on a fixture-locked topic.
- *   - Topics.show() forbids a hidden topic (403) and Forums.show() hides it from a user below Profile.MODERATOR,
- *     which uses forum.getVisibleTopics().
+ *   - Topics.show() forbids a hidden topic below Permission.moderate (403 for anonymous and for a
+ *     replyer) and renders it for a moderator or an administrator, the level Forums.show() uses to list
+ *     it; Forums.show() drops it from the visible list of a user below that level through
+ *     forum.getVisibleTopics().
  *   - lock() does not spare a hidden topic: the only guard is @Check(Profile.MODERATOR).
  *   - notFoundIfNull() covers the three actions with an unknown topicId, and move() with an unknown toForumId.
  *   - An anonymous GET is redirected to /login with flash("url") = the lock path; a replyer is forbidden from
@@ -131,7 +133,8 @@ public class TopicsLockTest extends BaseForumViewTest {
 		assertFlashValue(hidden, "success", HIDDEN_FLASH);
 		assertEquals(Boolean.TRUE, hiddenOf(1L));
 
-		// Topics.show() forbids it, and Forums.show() drops it from the visible list of a plain user.
+		// Topics.show() forbids it below Permission.moderate, and Forums.show() drops it from the
+		// visible list of a plain user.
 		clearCookies();
 		login("bob@domain.com", "secret");
 		assertStatus(403, GET("/forums/1/topics/1"));
@@ -182,7 +185,7 @@ public class TopicsLockTest extends BaseForumViewTest {
 		assertEquals("forum=1", forumOf(1L));
 	}
 
-	/** A hidden topic is locked without a word, like delete() spares nothing. */
+	/** A hidden topic is locked without a word, like delete() spares nothing, and stays readable for the moderator. */
 	@Test
 	public void aHiddenTopicIsStillLocked() throws Throwable {
 		clearCookies();
@@ -192,7 +195,8 @@ public class TopicsLockTest extends BaseForumViewTest {
 		assertFlashValue(GET("/forums/1/topics/3/lock"), "success", LOCKED_FLASH);
 		assertEquals(Boolean.TRUE, lockedOf(3L));
 		assertEquals(Boolean.TRUE, hiddenOf(3L));
-		assertStatus(403, GET("/forums/1/topics/3"));
+		assertIsOk(GET("/forums/1/topics/3"));
+		assertHeader(markup(GET("/forums/1/topics/3")), "Topic Hidden", "1 post by 1 user");
 	}
 
 	// ~~~~~~~~~~~~ a locked topic takes no reply

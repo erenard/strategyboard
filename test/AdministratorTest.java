@@ -52,11 +52,11 @@ public class AdministratorTest extends BaseFunctionalTest {
 	}
 
 	@Test
-	public void cannotAccessToAHiddenTopic() {
-		// forum.Topics.show() forbids hidden topics for everybody, admins included
-		// (a moderator unhides it first).
+	public void canAccessToAHiddenTopic() {
+		// Topics.show() only forbids a hidden topic below Permission.moderate; an administrator is at
+		// Permission.administrate, so the forum list link it is given works.
 		Response response = GET("/forums/1/topics/3");
-		assertEquals(403, response.status.intValue());
+		assertIsOk(response);
 		assertContentType("text/html", response);
 		assertCharset(play.Play.defaultWebEncoding, response);
 	}

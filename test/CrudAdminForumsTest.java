@@ -64,6 +64,7 @@ public class CrudAdminForumsTest extends BaseCrudTest {
 		assertNumberField(body, "displayOrder", "", DISPLAY_ORDER_HELP);
 		assertRelationField(body, "category", "(Please select a value)", CATEGORY_HELP, null, CATEGORY_OPTIONS);
 		// Forum.locked = Boolean.FALSE, so the box starts unticked and the hidden input carries the false
+		// value that crud.checkField always posts
 		assertCheckbox(body, "locked", false);
 		assertUnknownField(body, "topics");
 	}
@@ -160,6 +161,7 @@ public class CrudAdminForumsTest extends BaseCrudTest {
 		assertNumberField(body, "displayOrder", "6", DISPLAY_ORDER_HELP);
 		assertRelationFieldError(body, "category", "(Please select a value)", CATEGORY_HELP, "Required", null,
 				CATEGORY_OPTIONS);
+		// The flag is read back from the object CRUD.create constructed, not from a row
 		assertCheckbox(body, "locked", true);
 
 		assertEquals(5, inTransaction(() -> Forum.count()).longValue());
@@ -215,10 +217,11 @@ public class CrudAdminForumsTest extends BaseCrudTest {
 		assertLongTextField(body, "description", "Fresh forum", DESCRIPTION_HELP);
 		assertNumberField(body, "displayOrder", "6", DISPLAY_ORDER_HELP);
 		assertRelationField(body, "category", "(Please select a value)", CATEGORY_HELP, "2", CATEGORY_OPTIONS);
-		// object.locked was not posted, so the hidden false input decided it
+		// object.locked was not posted, so the hidden false input crud.checkField always writes decided it
 		assertCheckbox(body, "locked", false);
 
 		assertEquals(6, inTransaction(() -> Forum.count()).longValue());
+		Forum created = inTransaction(() -> Forum.findById(6L));
 		// crud_unknown renders no input, so object.topics.id is nothing the binder can read
 		assertEquals(5, inTransaction(() -> Topic.count()).longValue());
 		Topic topic1 = inTransaction(() -> Topic.findById(1L));

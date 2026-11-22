@@ -79,6 +79,24 @@ public abstract class BaseForumViewTest extends BaseFunctionalTest {
 		return body;
 	}
 
+	/**
+	 * A GET request carrying a referer header. FunctionalTest.newRequest() builds a request with no
+	 * header at all, and Application.backToPreviousPage() reads the referer, so a request that wants the
+	 * referer branch of that helper has to install it here.
+	 */
+	protected static Response GETFrom(String referer, Object url) {
+		Http.Request request = newRequest();
+		request.headers.put("referer", new Http.Header("referer", referer));
+		return GET(request, url);
+	}
+
+	/** The same, for a form POST. */
+	protected static Response POSTFrom(String referer, Object url, Map<String, String> parameters) {
+		Http.Request request = newRequest();
+		request.headers.put("referer", new Http.Header("referer", referer));
+		return POST(request, url, parameters, new HashMap<String, java.io.File>());
+	}
+
 	protected static String location(Response response) {
 		Http.Header header = response.headers.get("Location");
 		if (header == null) {
@@ -349,17 +367,42 @@ public abstract class BaseForumViewTest extends BaseFunctionalTest {
 		try {
 			return inTransaction(() -> TemplateLoader.load(path).render(args)).replaceAll("\\s+", " ");
 		} finally {
-			Http.Request.current.set(previousRequest);
-			Http.Response.current.set(previousResponse);
-			Scope.Session.current.set(previousSession);
-			Scope.Flash.current.set(previousFlash);
-			Scope.Params.current.set(previousParams);
-			Scope.RenderArgs.current.set(previousRenderArgs);
-			Validation.current.set(previousValidation != null ? previousValidation : new Validation() {
-			});
-			// Drop the errors the render added, so fixtures loaded later are not polluted by them.
-			Validation.errors().clear();
+			restoreThreadLocals();
 		}
+	}
+
+	/**
+	 * Renders a template with the default EntityManager unbound. That is the state
+	 * PlayHandler.serve404() renders errors/404.html in: it writes the page outside any controller, so
+	 * no JPA interceptor ran, and main.html's #{secure.check} tags reach User.findByEmail() with no
+	 * EntityManager. Before Profile.Security.check() started refusing that, the render raised
+	 * JPAException and an unmatched route answered 500 instead of 404.
+	 */
+	protected static String renderViewWithoutEntityManager(String path, Map<String, Object> args) throws Throwable {
+		javax.persistence.EntityManager em = JPA.isInsideTransaction() ? JPA.em() : null;
+		JPA.unbindForCurrentThread(JPA.DEFAULT);
+		try {
+			return TemplateLoader.load(path).render(args).replaceAll("\\s+", " ");
+		} finally {
+			if (em != null) {
+				JPA.bindForCurrentThread(JPA.DEFAULT, em, false);
+			}
+			restoreThreadLocals();
+		}
+	}
+
+	/** Puts the thread-locals viewArgs() replaced back, and drops the errors the render added. */
+	private static void restoreThreadLocals() {
+		Http.Request.current.set(previousRequest);
+		Http.Response.current.set(previousResponse);
+		Scope.Session.current.set(previousSession);
+		Scope.Flash.current.set(previousFlash);
+		Scope.Params.current.set(previousParams);
+		Scope.RenderArgs.current.set(previousRenderArgs);
+		Validation.current.set(previousValidation != null ? previousValidation : new Validation() {
+		});
+		// Drop the errors the render added, so fixtures loaded later are not polluted by them.
+		Validation.errors().clear();
 	}
 
 	/** Renders a template with one validation error installed, which no controller produces. */

@@ -13,6 +13,11 @@ import models.forum.Topic;
  *   - toString() is the name, which is what every template prints (Categories/index.html, the CRUD lists).
  *   - getForumsCount(), getTopicsCount() and getPostsCount() count through the relations, so a hidden topic
  *     and its post are counted: Main Category holds the hidden topic t3 of Forum 1 (test/data.yml).
+ *   - getVisibleTopicsCount() and getVisiblePostsCount() are what forum.Forums.index() uses below
+ *     Permission.moderate: Topic.hidden is dropped from the topic and post counts. They read the paths of
+ *     the entity they query - Topic.count() takes "hidden = false", not "topic.hidden = false", because
+ *     Play binds the root entity as "e" and HQL resolves an unqualified name against it, while Post has no
+ *     direct category and must walk topic.forum.
  *   - getForums() and getLastPost() take a page and a page size; getLastPost() only looks at visible topics.
  *   - forUser(email) walks Permission -> UserGroup -> User and drops accessLevel 0. The Admin group of
  *     test/data.yml has no Permission row at all, so the administrator gets an empty list here even though
@@ -65,6 +70,25 @@ public class CategoryModelTest extends BaseModelTest {
 			Assert.assertEquals("2", String.valueOf(moderators.getForumsCount()));
 			Assert.assertEquals("0", String.valueOf(moderators.getTopicsCount()));
 			Assert.assertEquals("0", String.valueOf(moderators.getPostsCount()));
+			return null;
+		});
+	}
+
+	@Test
+	public void visibleCountsDropHiddenTopics() throws Throwable {
+		inTransactionVoid(() -> {
+			Category main = Category.findById(2L);
+
+			// The hidden topic t3 of mainForum1 and its post are dropped, which is why 5 becomes 4 here
+			Assert.assertEquals("4", String.valueOf(main.getVisibleTopicsCount()));
+			Assert.assertEquals("5", String.valueOf(main.getVisiblePostsCount()));
+			Assert.assertEquals("5", String.valueOf(main.getTopicsCount()));
+			Assert.assertEquals("6", String.valueOf(main.getPostsCount()));
+
+			// Moderators Category holds no topic at all
+			Category moderators = Category.findById(1L);
+			Assert.assertEquals("0", String.valueOf(moderators.getVisibleTopicsCount()));
+			Assert.assertEquals("0", String.valueOf(moderators.getVisiblePostsCount()));
 			return null;
 		});
 	}

@@ -13,6 +13,7 @@ import play.libs.F;
 
 import controllers.Application;
 import models.forum.Attachment;
+import models.forum.Forum;
 import models.forum.Post;
 import models.forum.Topic;
 import models.forum.User;
@@ -41,6 +42,10 @@ import models.leaderboard.Scenario;
  * Play.configuration) and restore it afterwards. Application.index also has to render its page
  * parameter - action parameters are not added to renderArgs by the framework, so without it
  * "page ?: 1" could only ever take its left side.
+ *
+ * The news list comes from Forum.getVisibleTopics(), which filters topic.hidden. Nothing on this page is
+ * resolved per role, so a hidden news topic is absent for an anonymous visitor, a moderator and an
+ * administrator alike.
  */
 public class IndexPageTest extends BaseFunctionalTest {
 
@@ -271,6 +276,33 @@ public class IndexPageTest extends BaseFunctionalTest {
 		assertContains("<title>Strategyboard - News</title>", body);
 	}
 
+	/**
+	 * Application.index() reads getVisibleTopics(), so a hidden news topic never reaches the home page.
+	 * The page is public, so the flag is not resolved per role: an administrator, who reads a hidden topic
+	 * through forum.Forums.show(), does not get it here either.
+	 */
+	@Test
+	public void aHiddenNewsTopicIsAbsentFromTheHomePageForEveryRole() throws Throwable {
+		seedHiddenNews();
+
+		// Its post is the newest of the Home Page forum, so an unfiltered getTopics() would print it first
+		String anonymous = getContent(GET("/"));
+		assertContains("Plain news", anonymous);
+		assertNotContains("Hidden news", anonymous);
+
+		clearCookies();
+		login("modo@domain.com", "secret");
+		assertNotContains("Hidden news", getContent(GET("/")));
+
+		clearCookies();
+		login("admin@domain.com", "secret");
+		assertNotContains("Hidden news", getContent(GET("/")));
+
+		// It stays readable at Permission.moderate, on its forum page
+		assertIsOk(GET("/forums/5/topics/8"));
+		assertContains("Hidden news", getContent(GET("/forums/5/topics/8")));
+	}
+
 	// ~~~~~~~~~~~~ logged in (connectedUser is the user, uuid set by Secure.onAuthenticated())
 
 	@Test
@@ -357,6 +389,22 @@ public class IndexPageTest extends BaseFunctionalTest {
 		Calendar calendar = Calendar.getInstance();
 		calendar.add(Calendar.DAY_OF_MONTH, -days);
 		return calendar.getTime();
+	}
+
+	/**
+	 * One hidden news topic in the Home Page forum, with the newest post of that forum: after data.yml
+	 * (topics 1..5) and index-data.yml (topics 6, 7) it takes topic id 8, so forum.Forums.show(5) can be
+	 * addressed as /forums/5/topics/8.
+	 */
+	private void seedHiddenNews() throws Throwable {
+		JPA.withTransaction(JPA.DEFAULT, false, () -> {
+			Forum homePage = Forum.findById(5L);
+			Topic hidden = new Topic(homePage, User.findByEmail("news@domain.com"), "Hidden news",
+					"Body of the hidden news post.");
+			hidden.hidden = Boolean.TRUE;
+			hidden.save();
+			return null;
+		});
 	}
 
 	/** Empties the Home Page forum, attachments first so no post row is left dangling. */

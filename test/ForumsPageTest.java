@@ -21,6 +21,11 @@ import models.forum.UserGroup;
  * Coverage of app/views/forum/Forums/*.html: index.html and show.html, in both directions of every
  * conditional.
  *
+ * The counts of index.html are decided per category, because Permission is one row per
+ * (group, category): forum.Forums.index() takes getVisibleTopicsCount()/getVisiblePostsCount() for the
+ * categories whose Permission row is below Permission.moderate, so a hidden topic is not advertised
+ * there, and forum.Forums.show() drops it from its own list the same way.
+ *
  * show.html's #{if topic.lastPost} false branch is unreachable through the database: Topic.getFirstPost()
  * and Topic.getLastPost() read the same rows, and the same row dereferences ${topic.firstPost.subject}.
  * It is exercised by rendering the template with a topic stub whose getLastPost() returns null.
@@ -34,11 +39,13 @@ public class ForumsPageTest extends BaseForumViewTest {
 		clearCookies();
 		String body = markup(GET("/forums"));
 
-		assertHeader(body, "Forums", "6 posts in 5 topics");
+		// Below Permission.moderate the counts come from Category.getVisibleTopicsCount() and
+		// getVisiblePostsCount(), so the hidden topic t3 and its post 4 are not advertised
+		assertHeader(body, "Forums", "5 posts in 4 topics");
 		Assert.assertEquals("[Main Category]", panelTitles(body).toString());
 		List<String> rows = tableRows(body);
 		Assert.assertEquals(3, rows.size());
-		assertContains("<a href=\"/forums/1\">mainForum1</a> <p class=\"light\"> 4 posts in 3 topics </p>"
+		assertContains("<a href=\"/forums/1\">mainForum1</a> <p class=\"light\"> 3 posts in 2 topics </p>"
 				+ " Main forum 1 description", rows.get(0));
 		// #{if forum.lastPost} true branch, with the view link pointing at the last post's page
 		assertContains("by <strong>Moderator</strong> (<a href=\"/forums/1/topics/2?page=1\">view</a>)", rows.get(0));
@@ -57,6 +64,8 @@ public class ForumsPageTest extends BaseForumViewTest {
 		login("modo@domain.com", "secret");
 		String body = markup(GET("/forums"));
 
+		// Permission.moderateMain gives Main Category level 4 -> the full counts; Permission.post
+		// gives Moderators Category level 3 -> the visible ones, which are 0/0 anyway
 		assertHeader(body, "Forums", "6 posts in 5 topics");
 		assertSuccessAlert("Welcome back Moderator !", body);
 		Assert.assertEquals("[Moderators Category, Main Category]", panelTitles(body).toString());
@@ -274,7 +283,8 @@ public class ForumsPageTest extends BaseForumViewTest {
 
 		// forum/Forums/show.html takes the false branch of #{ifnot forum.locked}: only the moderation
 		// button is left
-		Assert.assertEquals("[(Un)lock -> /forums/1/lock]", actionButtons(markup(GET("/forums/1"))).toString());
+		Assert.assertEquals("[(Un)lock -> /forums/1/lock]",
+				actionButtons(markup(GET("/forums/1"))).toString());
 
 		Response unlocked = GET("/forums/1/lock");
 		assertStatus(302, unlocked);
@@ -364,6 +374,13 @@ public class ForumsPageTest extends BaseForumViewTest {
 		return inTransaction(() -> {
 			Forum forum = Forum.findById(forumId);
 			return "locked=" + forum.locked;
+		});
+	}
+
+	private static String dbViews(Long topicId) throws Throwable {
+		return inTransaction(() -> {
+			Topic topic = Topic.findById(topicId);
+			return "views=" + topic.views;
 		});
 	}
 
