@@ -2,13 +2,6 @@
 #{set title:'News' /}
 <div class="row">
 	<div class="col-xs-12 col-sm-4 col-md-3">
-		<!--
-		#{miniOpenTTDStatus articStatus /}
-		#{miniOpenTTDStatus deserticStatus /}
-		#{miniOpenTTDStatus highSpeedStatus /}
-		#{miniOpenTTDStatus steamStatus /}
-		#{miniOpenTTDStatus toylandStatus /}
-		-->
 		#{if connectedUser} #{ingameLogin connectedUser /} #{/if}
 		#{miniLeaderBoard playerScores /}
 	</div>

@@ -25,14 +25,12 @@ import models.leaderboard.Scenario;
 /**
  * Coverage of app/views/Application/index.html: every construct of the template, and of
  * the tags it renders (ingameLogin, miniLeaderBoard, showNews -> attachments -> pluralize,
- * pagination, miniOpenTTDStatus), runs in both directions of each conditional.
+ * pagination), runs in both directions of each conditional.
  *
- * Two branches are unreachable from this template and are asserted as absent instead of
- * exercised:
- *   - miniOpenTTDStatus's arg branch: Play does not skip tags inside HTML comments, so the
- *     five commented-out calls do run, but nothing ever puts articStatus, deserticStatus,
- *     highSpeedStatus, steamStatus or toylandStatus into renderArgs -> they always take the
- *     "server is down" path.
+ * Two things are asserted as absent rather than exercised:
+ *   - miniOpenTTDStatus: index.html no longer calls it. The commented-out block of five calls
+ *     was removed, so Play has nothing to compile there - Play does not skip tags inside HTML
+ *     comments, which is why those five panels used to render on every home page.
  *   - ingameLogin's login-link branch: index.html only calls the tag when connectedUser is
  *     truthy, so its else path can never be reached.
  *
@@ -95,20 +93,22 @@ public class IndexPageTest extends BaseFunctionalTest {
 	}
 
 	@Test
-	public void commentedOpenTTDStatusTagsStillRenderFiveDownPanels() throws Throwable {
+	public void leftColumnRendersOnlyTheLeaderboardPanel() throws Throwable {
 		String body = getContent(GET("/"));
 		String leftColumn = leftColumn(body);
 
-		// Play compiles tags inside HTML comments (see Template_1022 in precompiled/), so the
-		// five commented-out miniOpenTTDStatus calls render, with a null arg -> else branch.
-		assertContains("<!--", leftColumn);
-		assertContains("-->", leftColumn);
-		assertEquals(5, count("Server is down :(", leftColumn));
-		assertEquals(5, count(">OpenTTD server</a>", leftColumn));
-		// the panels sit between the comment markers, and the rest of the page still renders
-		assertTrue(leftColumn.indexOf("<!--") < leftColumn.indexOf("Server is down :("));
-		assertTrue(leftColumn.indexOf("Server is down :(") < leftColumn.indexOf("-->"));
+		// index.html no longer carries the commented #{miniOpenTTDStatus} block, so neither the
+		// comment markers nor the five "server is down" panels appear: Play compiles tags inside
+		// HTML comments, which is what used to put them on every home page.
+		assertNotContains("<!--", leftColumn);
+		assertNotContains("-->", leftColumn);
+		assertNotContains("Server is down :(", leftColumn);
+		assertNotContains(">OpenTTD server</a>", leftColumn);
+		// The narrow column holds the leaderboard, and the page still has its two columns
+		assertContains("This month scores", leftColumn);
+		assertEquals(1, count("This month scores", leftColumn));
 		assertContains("<div class=\"row\">", body);
+		assertContains("<div class=\"col-xs-12 col-sm-8 col-md-9\">", body);
 	}
 
 	@Test
