@@ -1,6 +1,8 @@
 package controllers.forum;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 import controllers.Application;
 import controllers.Check;
@@ -22,24 +24,44 @@ public class Forums extends Application {
 	 */
 	@Check(Profile.VIEWER)
 	public static void index() {
+		User user = (User) renderArgs.get("connectedUser");
 		List<Category> categories;
-		{
-			User user = (User) renderArgs.get("connectedUser");
-			if(user == null) {
-				categories = Category.forUser(Profile.ANONYMOUS_EMAIL);
-			} else if(user.group != null && user.group.admin) {
-				categories = Category.findAll();
-			} else {
-				categories = Category.forUser(user.email);
-			}
+		if(user == null) {
+			categories = Category.forUser(Profile.ANONYMOUS_EMAIL);
+		} else if(user.group != null && user.group.admin) {
+			categories = Category.findAll();
+		} else {
+			categories = Category.forUser(user.email);
 		}
+		// Permission is one row per (group, category), so the counts a visitor is shown are decided per
+		// category: the Moderators group holds Permission.moderate in Main Category but only
+		// Permission.post in Moderators Category, and accessLevel() of this action is the Main Category
+		// fallback value. Below moderate, hidden topics stay out of the totals, as in forum.Forums.show().
+		Map<Category, Boolean> fullCountsByCategory = new LinkedHashMap<Category, Boolean>();
 		long topicsCount = 0;
 		long postsCount = 0;
 		for(Category category : categories) {
-			topicsCount += category.getTopicsCount();
-			postsCount += category.getPostsCount();
+			boolean seeHiddenTopics = canSeeHiddenTopics(user, category);
+			fullCountsByCategory.put(category, seeHiddenTopics);
+			topicsCount += seeHiddenTopics ? category.getTopicsCount() : category.getVisibleTopicsCount();
+			postsCount += seeHiddenTopics ? category.getPostsCount() : category.getVisiblePostsCount();
 		}
-		render(categories, topicsCount, postsCount);
+		render(categories, fullCountsByCategory, topicsCount, postsCount);
+	}
+
+	/**
+	 * Hidden topics are counted at Permission.moderate or above, the level forum.Forums.show() uses to
+	 * list them. The administrator passes through UserGroup.admin, as in Profile.Security.check().
+	 */
+	static boolean canSeeHiddenTopics(User user, Category category) {
+		if(user == null) {
+			return false;
+		}
+		if(Boolean.TRUE.equals(user.group.admin)) {
+			return true;
+		}
+		Permission permission = Permission.findByUserGroupAndCategory(user.group, category);
+		return permission != null && permission.accessLevel >= Permission.moderate;
 	}
 
 	/**

@@ -44,6 +44,12 @@ GET		/forgottenEmail		forum.Users.forgottenEmail
 POST	/forgottenEmail		forum.Users.showEmail
 GET		/users/{<[0-9]+>id}	forum.Users.show
 
+# Messages
+# forum.Messages.inbox() / outbox() were only reachable through the catch-all route as
+# /forum.messages/inbox; the navbar link needs a real url.
+GET		/messages/inbox			forum.Messages.inbox
+GET		/messages/outbox		forum.Messages.outbox
+
 # Attachments
 # The route argument must be named id: forum.Attachments.download(Long id) is bound by
 # parameter name, so an argument called attachmentId left id null and every download

@@ -159,12 +159,19 @@ public class Users extends Application {
 
 	@Check(Profile.LOGGED)
 	public static void profile() {
+		// The anonymous session passes the LOGGED check but has no real user: see Application.backToPreviousPage().
+		if(connectedUser() == null) {
+			backToPreviousPage();
+		}
 		User user = connectedUser();
 		render(user);
 	}
 
 	@Check(Profile.LOGGED)
 	public static void update(@Required @MinSize(5) String password, @Required @Email String email, @Equals("email") String email2, @MinSize(5) String newPassword, @Equals("newPassword") String newPassword2) {
+		if(connectedUser() == null) {
+			backToPreviousPage();
+		}
 		User user = connectedUser();
 		notFoundIfNull(user);
 		if(!user.passwordHash.equals(Codec.hexMD5(password))) {

@@ -21,7 +21,12 @@
 		        <td class="main">
 		            <a href="@{forum.Forums.show(forum.id)}">${forum.name}</a>
 		            <p class="light">
+		                #{if fullCountsByCategory[category]}
 		                #{pluralize size:forum.postsCount, word:'post' /} in #{pluralize size:forum.topicsCount, word:'topic' /}
+		                #{/if}
+		                #{else}
+		                #{pluralize size:forum.visiblePostsCount, word:'post' /} in #{pluralize size:forum.visibleTopicsCount, word:'topic' /}
+		                #{/else}
 		            </p>
 		            ${forum.description}
 		        </td>

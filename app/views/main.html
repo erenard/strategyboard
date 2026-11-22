@@ -76,8 +76,12 @@
                 <a href="#" class="dropdown-toggle" data-toggle="dropdown">${connectedUser.name} <b class="caret"></b></a>
                 <ul class="dropdown-menu">
                 #{if connectedUser.newMessagesCount > 0}
-                <li><a href="#"><span class="badge pull-right">${connectedUser.newMessagesCount}</span>Messages</a></li>
+                <li><a href="@{forum.Messages.inbox()}"><span class="badge pull-right">${connectedUser.newMessagesCount}</span>Messages</a></li>
                 #{/if}
+                #{else}
+                <li><a href="@{forum.Messages.inbox()}">Messages</a></li>
+                #{/else}
+                <li><a href="@{forum.Messages.outbox()}">Sent messages</a></li>
                 <li><a href="@{forum.Users.profile()}">My profile</a></li>
                 <li class="divider"></li>
                 <li><a href="@{Secure.logout}">Logout</a></li>

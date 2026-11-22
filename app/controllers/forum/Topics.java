@@ -9,6 +9,7 @@ import play.mvc.*;
 import play.data.validation.*;
 
 import models.forum.Forum;
+import models.forum.Permission;
 import models.forum.Topic;
 
 @With(Profile.class)
@@ -24,7 +25,12 @@ public class Topics extends Application {
 	public static void show(Long forumId, Long topicId, Integer page) {
 		Topic topic = Topic.findById(topicId);
 		notFoundIfNull(topic);
-		if(topic.hidden) {
+		// A hidden topic is invisible below Profile.MODERATOR - the same level Forums.show() uses to
+		// list it - so a moderator or an administrator can navigate to it from the forum list.
+		// accessLevel() is always set here: the VIEWER check succeeds either through the admin branch
+		// of Profile.Security.check(), which puts Permission.administrate, or through a Permission row,
+		// which puts its accessLevel.
+		if(topic.hidden && accessLevel() < Permission.moderate) {
 			forbidden("This topic is hidden.");
 		} else {
 			topic.views += 1;

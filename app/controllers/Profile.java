@@ -76,7 +76,17 @@ public class Profile extends Controller {
 		static boolean check(String profile) {
 			boolean result = false;
 			String email = session.get("username");
-			User user = User.findByEmail(email);
+			User user;
+			try {
+				user = User.findByEmail(email);
+			} catch(Exception e) {
+				// PlayHandler.serve404() renders errors/404.html - and so main.html, with its
+				// #{secure.check} tags - outside any controller, so no JPA interceptor ran and there is
+				// no EntityManager: User.findByEmail() raises JPAException. Nobody passes a check then,
+				// which is what lets an unmatched route answer 404 instead of 500.
+				if(Logger.isDebugEnabled()) Logger.debug("no EntityManager for " + profile + " on " + request.querystring);
+				return false;
+			}
 			if(profile.equals(LOGGED)) {
 				//If no profile is asked, check only if a user is logged
 				result = user != null;

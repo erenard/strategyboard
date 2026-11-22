@@ -49,6 +49,15 @@ public class Category extends Model {
 		return Post.count("topic.forum.category", this);
 	}
 
+	/** getTopicsCount() without the hidden topics: Topic.hidden is dropped. */
+	public long getVisibleTopicsCount() {
+		return Topic.count("forum.category = ?1 and hidden = false", this);
+	}
+
+	public long getVisiblePostsCount() {
+		return Post.count("topic.forum.category = ?1 and topic.hidden = false", this);
+	}
+
 	public List<Forum> getForums(int page, int pageSize) {
 		return Forum.find("category = ?1", this).fetch(page, pageSize);
 	}
